@@ -1,0 +1,61 @@
+/* Main container that holds both components */
+.main-container {
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden; /* Ensures no scrollbars if content overflows */
+}
+
+/* Left container for PdfUpload component */
+.left-container {
+  width: 20%;           /* 20% of the width */
+  background-color: #1A223F; /* Light gray background */
+  /* padding: 20px; */
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1); /* Subtle shadow on right side */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+/* Right container for Chatbot component */
+.right-container {
+  width: 80%;           /* 80% of the width */
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Add custom PDF Upload button style if needed */
+.container button {
+  background-color: #2c4f40;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+}
+
+.container button:hover {
+  background-color: #254c3b;
+}
+
+/* Chatbot styling (importing from Chatbot.css) */
+.external-chatbot-container {
+  height: 100%; /* Full height for the chatbot container */
+  font-family: 'Arial', sans-serif;
+  background-color: #f1f1f1;
+}
+
+/* Ensure chatbot and its elements take up the necessary space */
+.chatbot-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+  width: 100%;
+  background-color: #ffffff;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}

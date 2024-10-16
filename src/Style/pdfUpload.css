@@ -1,0 +1,78 @@
+/* Container for the entire PDF upload section */
+.upload-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; /* Full height to center vertically */
+  background-color: #1A223F; /* Light background for contrast */
+  /* padding: 20px; */
+}
+
+.custom-file-upload {
+  display: inline-block;
+  padding: 12px 24px;
+  cursor: pointer;
+  background-color: #1A223F;
+  color: white;
+  border: 2px solid #fff;
+  border-radius: 8px;
+  font-size: 16px;
+  font-family: Arial, sans-serif;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+  text-align: center;
+}
+
+.custom-file-upload:hover {
+  background-color: #343d60;
+  border-color: #ccc;
+}
+
+.upload-icon {
+  margin-right: 8px;
+  font-size: 18px;
+}
+
+input[type="file"] {
+  display: none;
+}
+
+/* Message indicating the file has been uploaded */
+.pdf-p {
+  margin-top: 15px;
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+
+/* Recommended questions styling */
+.recommended-questions {
+  margin-top: 20px;
+  color: #FFFFFF; /* White text for questions */
+  text-align: left;
+  width: 100%; /* Full width */
+  max-width: 600px; /* Limit width for readability */
+}
+
+.recommended-questions h3 {
+  font-size: 20px;
+  margin-bottom: 10px;
+  text-align: center; /* Center the heading */
+}
+
+.recommended-questions ul {
+  list-style-type: none; /* Remove bullet points */
+  padding-left: 0; /* Remove left padding from list */
+}
+
+.recommended-questions li {
+  margin-bottom: 20px; /* Space between questions */
+  font-size: 16px; /* Adjust font size */
+  cursor: pointer; /* Make the questions look clickable */
+  transition: color 0.3s ease;
+}
+
+.recommended-questions li:hover {
+  color: rgba(255, 255, 255, 0.497); /* Highlight question on hover */
+}
