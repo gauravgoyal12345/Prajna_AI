@@ -3,12 +3,28 @@ import os
 from flask_cors import CORS
 from PyPDF2 import PdfReader
 from io import BytesIO
+from flask_pymongo import PyMongo, ObjectId
 from question_reccomender import summarize_pdf
+from datetime import datetime
+import bcrypt
+from pymongo import MongoClient
 # Initialize Flask app
 app = Flask(__name__)
 
 # Enable CORS (Cross-Origin Resource Sharing) for all routes
 CORS(app)
+
+mongo_uri = os.getenv('MONGO_URI')
+client = MongoClient(mongo_uri, server_api=ServerApi('1'))
+
+try:
+    client.admin.command('ping')
+    print("Pinged your deployment. You successfully connected to MongoDB!")
+except Exception as e:
+    print(f"Error connecting to MongoDB: {e}")
+
+users_collection = client.myapp.users
+chat_summaries_collection = client.myapp.chat_summaries
 
 # Set the upload folder where the PDF files will be saved
 UPLOAD_FOLDER = 'uploads'
@@ -55,6 +71,97 @@ def upload_files():
     print(filetext)    
     print(summarize_pdf(filetext))
     return jsonify({'message': 'Files uploaded successfully', 'files': file_paths}), 200
+
+@app.route("/register", methods=['POST'])
+def createUser():
+    data = request.json
+    
+    # Check if all required fields are present
+    required_fields = ['name', 'email', 'password']
+    for field in required_fields:
+        if not data.get(field):  # Check if field is missing or empty
+            return jsonify({"msg": f"'{field}' is required"}), 400
+    
+    # Check if the user already exists by email
+    if users_collection.find_one({'email': data['email']}):
+        return jsonify({"msg": "User already exists"}), 400
+    
+    # Hash the password
+    hashed_password = bcrypt.hashpw(data['password'].encode('utf-8'), bcrypt.gensalt())
+    
+    # Insert new user into the database
+    users_collection.insert_one({
+        'name': data['name'],
+        'email': data['email'],
+        'password': hashed_password.decode('utf-8'),
+    })
+    
+    return jsonify({"msg": "User created successfully"}), 201
+
+
+# User login
+@app.route("/login", methods=['POST'])
+def loginUser():
+    data = request.json
+    required_fields = ['email', 'password']
+    
+    for field in required_fields:
+        if not data.get(field):
+            return jsonify({"msg": f"'{field}' is required"}), 400
+
+    # Find the user by email
+    user = users_collection.find_one({'email': data['email']})
+    
+    if user and bcrypt.checkpw(data['password'].encode('utf-8'), user['password'].encode('utf-8')):
+        return jsonify({
+            "msg": "Login successful",
+            "user": {
+                "name": user['name'],
+                "email": user['email'],
+            }
+        }), 200
+
+    return jsonify({"msg": "Invalid email or password"}), 401
+
+@app.route("/chat_summary", methods=['POST'])
+def save_chat_summary():
+    data = request.json
+
+    # Check if the required fields are present
+    if not data.get('email') or not data.get('summary'):
+        return jsonify({"msg": "'email' and 'summary' are required"}), 400
+
+    summary = generate_summary(data)
+    # Store the chat summary in the database
+    chat_summary = {
+        'email': data['email'],
+        'summary': data['summary'],
+        'timestamp': datetime.utcnow()  # Optionally add a timestamp
+    }
+
+    chat_summaries_collection.insert_one(chat_summary)
+    
+    return jsonify({"msg": "Chat summary saved successfully"}), 201
+
+app.route("/chat_summary/<email>", methods=['GET'])
+def get_chat_summaries(email):
+    # Find chat summaries for the specified email, sorted by timestamp (most recent first)
+    summaries = chat_summaries_collection.find({'email': email}).sort('timestamp', -1)
+
+    # Convert the cursor to a list of summaries
+    summaries_list = []
+    for summary in summaries:
+        summaries_list.append({
+            'summary': summary['summary'],
+            'timestamp': summary['timestamp']
+        })
+
+    # Check if any summaries were found
+    if not summaries_list:
+        return jsonify({"msg": "No summaries found for this user"}), 404
+
+    return jsonify(summaries_list), 200
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=PORT, debug=True)
