@@ -1,12 +1,17 @@
 /* Full-screen black background */
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
 .landing-container {
   display: flex;
   flex-direction: column; /* Ensure vertical stacking of elements */
   justify-content: center;
   align-items: center;
-  height: 100vh;
+  height: calc(100vh - 7vh);
   background-color: black;
-  gap: 30px; /* Add spacing between the heading and the meet-team section */
+  /* Add spacing between the heading and the meet-team section */
 }
 
 /* Gradient text styling for the typing effect */
