@@ -12,7 +12,7 @@
     justify-content: space-between;
     align-items: center;
     /* color: #fff; */
-    background: #dce8e3;
+    background: black;
 }
 
 .custom-nav-left {
@@ -42,7 +42,7 @@
     padding: 0;
     margin: 0;
     /* color: rgb(222, 233, 241); */
-    color: #2c4f40;
+    color: linear-gradient(to right, #567350, #e6f4e4);
 }
 
 .custom-nav-links li:hover {
@@ -53,7 +53,8 @@
 
 
 .custom-nav-links a {
-    color: #2c4f40;
+    color: #23dc8c;
     text-decoration: none;
-    font-weight: 495;
+    font-weight: 500;
+    font-size: 800;
 }

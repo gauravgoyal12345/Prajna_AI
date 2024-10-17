@@ -92,7 +92,6 @@ function FinalComponents() {
 
         // Simulate a delay for bot response
         const userRagChatData = {'email' : userData.email, 'question' : message, 'session_id' : userData.uid };
-        await new Promise(resolve => setTimeout(resolve, 200)); // 1 second delay
 
         const response = await axios.post("http://localhost:5000/handle_query", userRagChatData);
 
@@ -165,18 +164,26 @@ function FinalComponents() {
         <div className='external-chatbot-container'>
           <div className="chatbot-container">
             <div className="chat-window" ref={chatWindowRef}>
-              {messages && messages.map((msg, index) => (
+            {messages && messages.map((msg, index) => (
                 <div
-                  key={index}
-                  className={`message ${msg.sender === "user" ? "user-message" : "bot-message"}`}
+                    key={index}
+                    className={`message ${msg.sender === "user" ? "user-message" : "bot-message"}`}
                 >
-                  {msg.sender === "bot" ? (
-                    <p dangerouslySetInnerHTML={{ __html: formatResponse(msg.text) }} />
-                  ) : (
+                    {msg.sender === "bot" ? (
+                    <TypeAnimation
+                        sequence={[
+                            msg.text,   // The bot's response
+                        10,  // Optional delay after typing
+                        ]}
+                        wrapper="p"     // The wrapper element
+                        speed={1}      // Typing speed
+                        repeat={0}      // Don't repeat
+                    />
+                    ) : (
                     <p>{msg.text}</p>
-                  )}
+                    )}
                 </div>
-              ))}
+                ))}
               {/* Display the bot's response with TypeAnimation */}
               {botResponse && (
                 <div className="message bot-message">
@@ -190,7 +197,7 @@ function FinalComponents() {
                       },
                     ]}
                     wrapper="span"
-                    speed={10}       // Instant display (no typing effect)
+                    speed={1}       // Instant display (no typing effect)
                     repeat={0}      // Don't repeat the animation
                   />
                 </div>
