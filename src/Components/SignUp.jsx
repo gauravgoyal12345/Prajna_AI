@@ -39,7 +39,7 @@ function SignUp() {
     
     const handleSignUpSubmit = async (e) => {
         e.preventDefault();
-        if (signUpData.name.trim() === '' || signUpData.email.trim() === '' || signUpData.gender.trim() === '' || signUpData.password.trim() === '' || signUpData.ConfirmPassword.trim() === '') {
+        if (signUpData.name.trim() === '' || signUpData.email.trim() === '' || signUpData.password.trim() === '' || signUpData.ConfirmPassword.trim() === '') {
             setEmptyFieldAlert(true);
             setAlertMessage("Please Fill all the details");
             return;

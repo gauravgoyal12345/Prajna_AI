@@ -15,6 +15,7 @@ const LandingPage = () => {
             'Efficient.', 1000, 
             'Future-ready.', 1000,
           ]}
+          
           wrapper="span"
           cursor={true}
           repeat={0}

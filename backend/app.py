@@ -4,6 +4,7 @@ from flask_cors import CORS
 from PyPDF2 import PdfReader
 from io import BytesIO
 from flask_pymongo import PyMongo, ObjectId
+from pymongo.server_api import ServerApi
 from question_reccomender import summarize_pdf
 from rag import get_ans
 from datetime import datetime
@@ -11,7 +12,10 @@ import bcrypt
 from pymongo import MongoClient
 # Initialize Flask app
 app = Flask(__name__)
+from dotenv import load_dotenv
 
+# Load environment variables from the .env file
+load_dotenv()
 # Enable CORS (Cross-Origin Resource Sharing) for all routes
 CORS(app)
 
@@ -70,8 +74,8 @@ def upload_files():
         else:
             return jsonify({'error': 'Invalid file type. Only PDF files are allowed.'}), 400
     print(filetext)    
-    print(summarize_pdf(filetext))
-    return jsonify({'message': 'Files uploaded successfully', 'files': file_paths}), 200
+    result=summarize_pdf(filetext)
+    return jsonify({'message': result}), 200
 
 @app.route("/register", methods=['POST'])
 def createUser():
