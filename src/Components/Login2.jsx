@@ -7,12 +7,16 @@ import Typography from '@mui/material/Typography';
 import axios from 'axios';
 import bgImg from "../Assets/bg3.avif"; // Make sure the path to the image is correct
 import {useNavigate } from 'react-router-dom';
+import { v4 as uuidv4 } from 'uuid';
 const validator = require('validator');
+
+
 export default function LogInForm() {
   const [loginData, setLogInData] = useState({
     email: '',
     password: ''
   });
+
   const navigate = useNavigate();
   const [emptyField, setEmptyFieldAlert] = useState(false);
   const [incorrectField, setIncorrectFieldAlert] = useState(false);
@@ -58,9 +62,27 @@ export default function LogInForm() {
     try {
         // Create a copy of signUpData excluding ConfirmPassword
         setSubmitted(true);
-        const response = await axios.post("http://localhost:5000/register", loginData);
+        const response = await axios.post("http://localhost:5000/login", loginData);
         
-        if(response.status === 201){
+        if(response.status === 200){
+            let userData = response.data.user;
+
+            if (typeof userData === 'object' && userData !== null) {
+            const uId = uuidv4();
+
+            // Create a new object with all properties of userData and add uid
+            const newUserData = {
+                ...userData,   // Spread existing userData properties
+                uid: uId      // Add new uid field
+            };
+
+            // Store the new object in localStorage
+            localStorage.setItem('userDetails', JSON.stringify(newUserData));
+
+            console.log('New User Data:', newUserData);  // For debugging
+            } else {
+            console.error('userData is not an object. Cannot create newUserData.');
+            }
             setTimeout(() => {
                 navigate('/');
             }, 1000); // Delay of 3000ms (3 seconds)
@@ -174,16 +196,15 @@ export default function LogInForm() {
             Submit
           </Button>
           {submitted && (
-                    <div className='result'>
-                        <div>
-                            <h2>Welcome {loginData.name}</h2>
-                            
-                            <p> Created User with Credentials</p>
-                            <p>Name: {loginData.name}</p>
-                            <p>Email: {loginData.email}</p>
-                            <h2>Now Please LogIn Again</h2>
-                        </div>
-                    </div>
+            <div className='result'>
+                <div>
+                    <h2 style={{ color: 'white' }}>Welcome {loginData.name}</h2>
+                    
+                    <p style={{ color: 'white' }}>Created User with Credentials</p>
+                    <p style={{ color: 'white' }}>Name: {loginData.name}</p>
+                    <p style={{ color: 'white' }}>Email: {loginData.email}</p>
+                </div>
+            </div>
           )}
         </Box>
       </Grid>

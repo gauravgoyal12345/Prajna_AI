@@ -12,10 +12,8 @@ function App() {
         {/* <Navbar /> */}
         <Routes>  
           <Route path='/' element = {<LandingPage/>}/>
-          <Route path='/login' element = {<Login/>}/>
-          <Route path='/login2' element = {<LogInForm/>}/>
-          <Route path='/signUp' element = {<SignUp/>}/>
-          <Route path='/signUp2' element = {<SignUpForm/>}/>
+          <Route path='/login' element = {<LogInForm/>}/>
+          <Route path='/signUp' element = {<SignUpForm/>}/>
           <Route path='/upload' element = {<FinalComponents/>}/>
 
         </Routes>

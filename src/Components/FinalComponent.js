@@ -15,6 +15,7 @@ function FinalComponents() {
   const chatWindowRef = useRef(null);
   const [emptyFieldAlert, setEmptyFieldAlert] = useState(false);
   const [userQuestions, setUserQuestions] = useState([]);
+  const [userData, setUserData] = useState([]);
   const [responseQuestions, setResponseQuestions] = useState([]); // New state for response questions
 
   const handleFileUpload = async (event) => {
@@ -57,6 +58,13 @@ function FinalComponents() {
     }
   }, [userQuestions]);  // Dependency array to watch changes in userQuestions
 
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem('userDetails'));
+    if (user) {
+        setUserData(user)
+    }
+  }, []);  // Dependency array to watch changes in userQuestions
+
   const handleTextInputChange = (e) => {
     setInput(e.target.value);
     setEmptyFieldAlert(false);
@@ -76,18 +84,31 @@ function FinalComponents() {
       setEmptyFieldAlert(true);
       return;
     }
+    try{
+        // User's message is added to the messages array
+        const newMessages = [...messages, { sender: "user", text: message }];
+        setMessages(newMessages);
+        setInput('');  // Clear input only for manual input case
 
-    // User's message is added to the messages array
-    const newMessages = [...messages, { sender: "user", text: message }];
-    setMessages(newMessages);
-    setInput('');  // Clear input only for manual input case
+        // Simulate a delay for bot response
+        const userRagChatData = {'email' : userData.email, 'question' : message, 'session_id' : userData.uid };
+        await new Promise(resolve => setTimeout(resolve, 200)); // 1 second delay
 
-    // Simulate a delay for bot response
-    await new Promise(resolve => setTimeout(resolve, 1000)); // 1 second delay
+        const response = await axios.post("http://localhost:5000/handle_query", userRagChatData);
 
-    // Simulated bot response
-    const responseText = "I am here to help";
-    setBotResponse(responseText);
+        let botResponse = '';
+        if (response.status === 200) {
+        botResponse = response.data.answer;
+        }
+        const updatedMessages = [
+            ...newMessages, 
+            { sender: "bot", text: botResponse }
+        ];
+        setMessages(updatedMessages);  // Update messages state with bot response
+    }
+    catch(error){
+        console.log(error);
+      }
   };
 
   const handleQuestionClick = (question) => {
