@@ -1,4 +1,6 @@
 
+print("Running app.py and not app(1).py")
+
 import pkg_resources
 
 installed_packages = pkg_resources.working_set
