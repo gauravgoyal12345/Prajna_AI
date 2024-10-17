@@ -1,2 +1,6 @@
 Flask==3.0.3
 Flask-Cors==5.0.0
+PyPDF2
+langchain_core
+langchain
+langchain_google_genai
