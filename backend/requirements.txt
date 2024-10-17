@@ -1,8 +1,8 @@
-Flask==3.0.3
+flask
 Flask-Cors==5.0.0
 PyPDF2
 langchain_core
 langchain
 langchain_google_genai
 langchain_community
-langchain_quadrant
+langchain_qdrant
