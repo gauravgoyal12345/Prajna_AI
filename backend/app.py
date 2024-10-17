@@ -131,12 +131,13 @@ def save_chat_summary():
     if not data.get('email') or not data.get('summary'):
         return jsonify({"msg": "'email' and 'summary' are required"}), 400
 
-    summary = generate_summary(data)
+    summary = generate_summary(data["summary"])
     # Store the chat summary in the database
     chat_summary = {
         'email': data['email'],
         'summary': data['summary'],
-        'timestamp': datetime.utcnow()  # Optionally add a timestamp
+        'timestamp': datetime.utcnow(), # Optionally add a timestamp
+        'pdf': data['pdf'],
     }
 
     chat_summaries_collection.insert_one(chat_summary)
@@ -153,7 +154,8 @@ def get_chat_summaries(email):
     for summary in summaries:
         summaries_list.append({
             'summary': summary['summary'],
-            'timestamp': summary['timestamp']
+            'timestamp': summary['timestamp'],
+            'pdfs': summary['pdf']
         })
 
     # Check if any summaries were found
@@ -162,6 +164,22 @@ def get_chat_summaries(email):
 
     return jsonify(summaries_list), 200
 
+@app.route("/handle_query", methods=['POST'])
+def handle_user_query():
+    data = request.json
+
+    # Check if the required fields are present
+    if not data.get('email') or not data.get('question'):
+        return jsonify({"msg": "'email' and 'question' are required"}), 400
+
+    email = data['email']
+    question = data['question']
+    session_id = data['session_id']
+
+    # Call the LLM to get the answer to the user's question
+    answer = query_llm_model(question, session_id)
+
+    return jsonify({"msg": "Query handled successfully", "question": question, "answer": answer}), 200
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=PORT, debug=True)
