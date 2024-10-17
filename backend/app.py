@@ -10,18 +10,25 @@ from summary import generate_summary
 from rag import get_ans
 from datetime import datetime
 import bcrypt
+from langchain_qdrant import QdrantVectorStore
+
 from pymongo import MongoClient
 # Initialize Flask app
 app = Flask(__name__)
 from dotenv import load_dotenv
+from langchain_google_genai import GoogleGenerativeAIEmbeddings
 
 # Load environment variables from the .env file
 load_dotenv()
 # Enable CORS (Cross-Origin Resource Sharing) for all routes
 CORS(app)
-
+api_key = os.getenv('api_key')
+url = os.getenv('url')
+google_api_key = os.getenv('GOOGLE_API_KEY')
 mongo_uri = os.getenv('MONGO_URI')
 client = MongoClient(mongo_uri, server_api=ServerApi('1'))
+embeddings = GoogleGenerativeAIEmbeddings(api_key=google_api_key,model="models/embedding-001")
+
 
 try:
     client.admin.command('ping')
@@ -35,6 +42,46 @@ chat_summaries_collection = client.myapp.chat_summaries
 # Set the upload folder where the PDF files will be saved
 UPLOAD_FOLDER = 'uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+
+from PyPDF2 import PdfReader
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain.docstore.document import Document
+
+def get_pdf_text(files):
+    text_chunks = []
+    for file in files:
+        pdf_reader = PdfReader(file.stream)  # Use file.stream as a file-like object
+        for page_num, page in enumerate(pdf_reader.pages):
+            text = page.extract_text()
+            if text:
+                paragraphs = text.split("\n\n")  # Split text into paragraphs
+                for para_num, paragraph in enumerate(paragraphs):
+                    text_chunks.append({
+                        "text": paragraph,
+                        "page_num": page_num + 1,  # Page number (1-based index)
+                        "paragraph_num": para_num + 1,  # Paragraph number (1-based index)
+                        "source_pdf": file.filename  # Use the original uploaded filename as the source
+                    })
+    return text_chunks
+
+# Function to split extracted text into smaller chunks for processing, including paragraph number
+def get_text_chunks(text_chunks):
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
+    split_chunks = []
+    for chunk in text_chunks:
+        splits = text_splitter.split_text(chunk["text"])
+        for split in splits:
+            split_chunks.append({
+                "text": split,
+                "page_num": chunk["page_num"],
+                "paragraph_num": chunk["paragraph_num"],  # Maintain paragraph number
+                "source_pdf": chunk["source_pdf"]
+            })
+    return split_chunks
+
+# Process the uploaded files
+
 
 def extract_text(file_content):
         pdf_reader = PdfReader(file_content)
@@ -55,8 +102,33 @@ def upload_files():
     files = request.files.getlist('pdfs')
     if not files:
         return jsonify({'error': 'No files uploaded'}), 400
+    
+    
 
     # List to store file paths of successfully saved PDFs
+    pdfchunks = get_pdf_text(files)
+    splitchunks = get_text_chunks(pdfchunks)
+    documents_with_metadata = [
+    Document(page_content=split['text'], metadata={
+        'page_num': split['page_num'],
+        'paragraph_num': split['paragraph_num'],
+        'source_pdf': split['source_pdf']
+    })
+    for split in splitchunks
+]
+    data = request.json
+
+    session_id = data['session_id']
+    vectorstore = QdrantVectorStore.from_documents(
+        documents_with_metadata,
+        embeddings,
+        url=url,
+        prefer_grpc=True,
+        api_key=api_key,
+        collection_name=session_id,
+        )
+
+    
     file_paths = []
     filetext = ""
     i =1
@@ -183,9 +255,9 @@ def handle_user_query():
     session_id = data['session_id']
 
     # Call the LLM to get the answer to the user's question
-    answer = get_ans(question, session_id)
+    answer,citations = get_ans(question, session_id)
 
-    return jsonify({"msg": "Query handled successfully", "question": question, "answer": answer}), 200
+    return jsonify({"msg": "Query handled successfully", "question": question, "answer": answer,"citations":citations}), 200
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=PORT, debug=True)
