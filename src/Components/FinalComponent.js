@@ -11,6 +11,7 @@ function FinalComponents() {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState([]);
+  const [citation, setSitation] = useState([]);
   const [botResponse, setBotResponse] = useState('');
   const chatWindowRef = useRef(null);
   const [emptyFieldAlert, setEmptyFieldAlert] = useState(false);
@@ -40,14 +41,13 @@ function FinalComponents() {
       }
 
       try {
-        const response = await axios.post('https://prajna-ai.onrender.com/upload', formData, {
+        const response = await axios.post('http://localhost:5000/upload', formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
           },
         });
 
         if (response.status === 200) {
-            debugger;
           setIsSubmitted(true);
           const questions = response.data.message
             .split('\n')
@@ -91,36 +91,37 @@ function FinalComponents() {
 
   const handleSendMessage = async (messageToSend) => {
     const message = messageToSend || input;  // Use clicked question or user input
-
+  
     if (message.trim() === '') {
       setEmptyFieldAlert(true);
       return;
     }
-    try{
-        // User's message is added to the messages array
-        const newMessages = [...messages, { sender: "user", text: message }];
-        setMessages(newMessages);
-        setInput('');  // Clear input only for manual input case
-
-        // Simulate a delay for bot response
-        const userRagChatData = {'email' : userData.email, 'question' : message, 'session_id' : userData.uid };
-
-        const response = await axios.post("https://prajna-ai.onrender.com/handle_query", userRagChatData);
-
-        let botResponse = '';
-        if (response.status === 200) {
-        botResponse = response.data.answer;
-        }
+    
+    try {
+      const newMessages = [...messages, { sender: "user", text: message }];
+      setMessages(newMessages);
+      setInput('');  // Clear input only for manual input case
+  
+      // Simulate a delay for bot response
+      const userRagChatData = { email: userData.email, question: message, session_id: userData.uid };
+      const response = await axios.post("http://localhost:5000/handle_query", userRagChatData);
+  
+      if (response.status === 200) {
+        const botResponse = response.data.answer;
+        const botCitations = response.data.citations;
+  
         const updatedMessages = [
-            ...newMessages, 
-            { sender: "bot", text: botResponse }
+          ...newMessages,
+          { sender: "bot", text: botResponse, citations: botCitations }  // Include citations
         ];
-        setMessages(updatedMessages);  // Update messages state with bot response
-    }
-    catch(error){
-        console.log(error);
+  
+        setMessages(updatedMessages);  // Update messages state with bot response and citations
       }
+    } catch (error) {
+      console.log(error);
+    }
   };
+  
 
   const handleQuestionClick = (question) => {
     handleSendMessage(question.text);  // Send the clicked question
@@ -175,46 +176,66 @@ function FinalComponents() {
       <div className="right-container">
         <div className='external-chatbot-container'>
           <div className="chatbot-container">
-            <div className="chat-window" ref={chatWindowRef}>
-            {messages && messages.map((msg, index) => (
+
+          <div className="chat-window" ref={chatWindowRef}>
+              {messages && messages.map((msg, index) => (
                 <div
-                    key={index}
-                    className={`message ${msg.sender === "user" ? "user-message" : "bot-message"}`}
+                  key={index}
+                  className={`message ${msg.sender === "user" ? "user-message" : "bot-message"}`}
                 >
-                    {msg.sender === "bot" ? (
-                    <TypeAnimation
+                  {msg.sender === "bot" ? (
+                    <>
+                      <TypeAnimation
                         sequence={[
-                            msg.text,   // The bot's response
-                        10,  // Optional delay after typing
+                          msg.text,  // The bot's response
                         ]}
-                        wrapper="p"     // The wrapper element
-                        speed={1}      // Typing speed
-                        repeat={0}      // Don't repeat
-                    />
-                    ) : (
+                        wrapper="p"  // The wrapper element
+                        speed={0.1}    // Typing speed
+                        repeat={0}   // Don't repeat
+                      />
+                      {/* {msg.citations && msg.citations.length > 0 && (
+                        <div className="citations">
+                          <h4>Citations:</h4>
+                          <ul>
+                            {msg.citations.map((citation, index) => (
+                              <li key={index}>
+                                {`Page ${citation.page_num}, Paragraph ${citation.paragraph_num}, Source: ${citation.source_pdf}`}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )} */}
+                     {msg.citations && msg.citations.length > 0 && (
+  <div className="citations">
+    <h4>Citations:</h4>
+    <ul>
+      {[...new Set(
+        msg.citations
+          .filter(citation => citation.source_pdf.endsWith('.pdf'))  // Exclude sources not ending with '.pdf'
+          .map(JSON.stringify)  // Stringify for unique set filtering
+      )].map((citation, index) => {
+        const parsedCitation = JSON.parse(citation);
+        const source = parsedCitation.source_pdf !== 'pdfs' 
+                        ? parsedCitation.source_pdf 
+                        : 'PDF File';  // Handle 'pdfs' as 'Unknown Source'
+        return (
+          <li key={index}>
+            {`Page ${parsedCitation.page_num}, Paragraph ${parsedCitation.paragraph_num}, Source: ${source}`}
+          </li>
+        );
+      })}
+    </ul>
+  </div>
+)}
+
+                    </>
+                  ) : (
                     <p>{msg.text}</p>
-                    )}
+                  )}
                 </div>
-                ))}
-              {/* Display the bot's response with TypeAnimation */}
-              {botResponse && (
-                <div className="message bot-message">
-                  <TypeAnimation
-                    sequence={[
-                      botResponse,   // String to display
-                      2000,          // Stay on the message for 2 seconds
-                      () => {
-                        // After animation, add the message to the state
-                        addBotResponseToMessages();
-                      },
-                    ]}
-                    wrapper="span"
-                    speed={1}       // Instant display (no typing effect)
-                    repeat={0}      // Don't repeat the animation
-                  />
-                </div>
-              )}
+              ))}
             </div>
+
             {emptyFieldAlert && <Alert message={"Please input a valid Message"} type="warning" />}
             <div className="input-container">
               <textarea

@@ -59,10 +59,48 @@ from PyPDF2 import PdfReader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.docstore.document import Document
 
-def get_pdf_text(files):
+
+from io import BytesIO
+from PyPDF2 import PdfReader
+
+
+
+
+
+if not os.path.exists(UPLOAD_FOLDER):
+    os.makedirs(UPLOAD_FOLDER)
+
+# Get port from environment variables or default to 5000
+PORT = os.environ.get('PORT', 5000)
+
+@app.route('/upload', methods=['POST'])
+def upload_files():
+    # Get the list of files from the request with key 'pdfs'
+    # print(request.files)
+    files = request.files.getlist('pdfs')
+    print("total files ::::>>>>>", files)
+    # print(files)
+    if not files:
+        return jsonify({'error': 'No files uploaded'}), 400
+    
     text_chunks = []
-    for file in files:
-        pdf_reader = PdfReader(file.stream)  # Use file.stream as a file-like object
+    file_paths = []
+    filetext = ""
+    i = 1
+    for pdf in files:
+        print("this is the pdf name :::>>>>>",pdf.name)
+        pdf_content = BytesIO(pdf.read())
+    
+        pdf_reader = PdfReader(pdf_content)
+        filename = os.path.join(app.config['UPLOAD_FOLDER'], pdf.filename)
+        pdf.save(filename)
+        text = ""
+        for page_num in range(len(pdf_reader.pages)):
+                text += pdf_reader.pages[page_num].extract_text()
+        filetext += f"\n\n pdf number {i} \n\n"
+        filetext += text
+        i += 1
+        # print("this is pdf reader ::::>>>>",pdf_reader)
         for page_num, page in enumerate(pdf_reader.pages):
             text = page.extract_text()
             if text:
@@ -72,12 +110,19 @@ def get_pdf_text(files):
                         "text": paragraph,
                         "page_num": page_num + 1,  # Page number (1-based index)
                         "paragraph_num": para_num + 1,  # Paragraph number (1-based index)
-                        "source_pdf": file.filename  # Use the original uploaded filename as the source
+                        "source_pdf": pdf.filename
                     })
-    return text_chunks
+    # print("this is text chunks :::>>>>>>",text_chunks)
+    # print("this is filetext::::>>>>>",filetext)
+    session_id = request.form.get('session_id')
+    if not session_id:
+        return jsonify({'error': 'Session ID is required'}), 400
+    # print(session_id)
+    # print(files)
 
-# Function to split extracted text into smaller chunks for processing, including paragraph number
-def get_text_chunks(text_chunks):
+    # Process PDF files and extract text
+    # pdfchunks = get_pdf_text(files)
+    
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
     split_chunks = []
     for chunk in text_chunks:
@@ -89,48 +134,17 @@ def get_text_chunks(text_chunks):
                 "paragraph_num": chunk["paragraph_num"],  # Maintain paragraph number
                 "source_pdf": chunk["source_pdf"]
             })
-    return split_chunks
-
-# Process the uploaded files
-
-
-def extract_text(file_content):
-        pdf_reader = PdfReader(file_content)
-        text = ""
-        for page_num in range(len(pdf_reader.pages)):
-            text += pdf_reader.pages[page_num].extract_text()
-        return text
-# Ensure the upload folder exists
-if not os.path.exists(UPLOAD_FOLDER):
-    os.makedirs(UPLOAD_FOLDER)
-
-# Get port from environment variables or default to 5000
-PORT = os.environ.get('PORT', 5000)
-
-@app.route('/upload', methods=['POST'])
-def upload_files():
-    # Get the list of files from the request with key 'pdfs'
-    files = request.files.getlist('pdfs')
-    if not files:
-        return jsonify({'error': 'No files uploaded'}), 400
-
-    # Extract session_id from form data (not JSON)
-    session_id = request.form.get('session_id')
-    if not session_id:
-        return jsonify({'error': 'Session ID is required'}), 400
-
-    # Process PDF files and extract text
-    pdfchunks = get_pdf_text(files)
-    splitchunks = get_text_chunks(pdfchunks)
     
+    # print("this is splitchunks:::>>>>",split_chunks)
     documents_with_metadata = [
         Document(page_content=split['text'], metadata={
             'page_num': split['page_num'],
             'paragraph_num': split['paragraph_num'],
             'source_pdf': split['source_pdf']
         })
-        for split in splitchunks
+        for split in split_chunks
     ]
+    # print("this is metadata:::::>>>>>",documents_with_metadata)
 
     # Store documents in vector store using session_id as collection name
     vectorstore = QdrantVectorStore.from_documents(
@@ -141,30 +155,53 @@ def upload_files():
         api_key=api_key,
         collection_name=session_id,
     )
+    # print("vector db made")
 
-    file_paths = []
-    filetext = ""
-    i = 1
-
-    for file in files:
-        if file and file.filename.endswith('.pdf'):  # Check if it's a valid PDF file
-            # Save the file to the UPLOAD_FOLDER
-            filename = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
-            file_content = BytesIO(file.read())
-            file.save(filename)
-            file_paths.append(filename)
-
-            # Extract text from PDF
-            text = extract_text(file_content)
-            filetext += f"\n\n pdf number {i} \n\n"
-            filetext += text
-            i += 1
-        else:
-            return jsonify({'error': 'Invalid file type. Only PDF files are allowed.'}), 400
-
-    print(filetext)
     
-    # Generate recommended questions based on the extracted PDF text
+    # for pdf in files:
+    #     pdf_content = BytesIO(pdf.read())
+    #     print("this is pdf content ", pdf_content)
+    #     pdf_reader1 = PdfReader(pdf_content)
+
+        # print(pdf_content)  # Check if pdf_content has data
+        # print(1)
+        # print ("this is pdf_reader :::>>>>>",pdf_reader1)
+        # # if not pdf_content.getvalue():
+        # #     print(7)  # Check if BytesIO has any data
+        # #     continue  # Skip empty files
+
+        
+        # pdf_reader = PdfReader(pdf_content)
+        
+        # text = ""
+        # for page_num in range(len(pdf_reader.pages)):
+        #         text += pdf_reader.pages[page_num].extract_text()
+        # filetext += f"\n\n pdf number {i} \n\n"
+        # filetext += text
+        # i += 1
+
+    # for file in files:
+        # if file and file.filename.endswith('.pdf'):  # Check if it's a valid PDF file
+        #     # Save the file to the UPLOAD_FOLDER
+        #     filename = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
+        #     file_content = BytesIO(file.read())
+        #     file.save(filename)
+        #     file_paths.append(filename)
+
+        #     # Extract text from PDF
+        #     pdf_reader = PdfReader(file_content)
+        #     text = ""
+        #     for page_num in range(len(pdf_reader.pages)):
+        #         text += pdf_reader.pages[page_num].extract_text()
+        #     filetext += f"\n\n pdf number {i} \n\n"
+        #     filetext += text
+        #     i += 1
+        # else:
+        #     return jsonify({'error': 'Invalid file type. Only PDF files are allowed.'}), 400
+
+    # print("this is filetext::::>>>>>>",filetext)
+    
+    # # Generate recommended questions based on the extracted PDF text
     result = question_recc(filetext)
 
     return jsonify({'message': result}), 200
@@ -275,6 +312,7 @@ def handle_user_query():
 
     # Call the LLM to get the answer to the user's question
     answer,citations = get_ans(question, session_id)
+    print(citations)
 
     return jsonify({"msg": "Query handled successfully", "question": question, "answer": answer,"citations":citations}), 200
 

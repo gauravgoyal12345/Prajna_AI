@@ -66,7 +66,7 @@ export default function SignUpForm() {
         // Create a copy of signUpData excluding ConfirmPassword
         const {confirmPassword, ...dataToSend} = signUpData;
         setSubmitted(true);
-        const response = await axios.post("https://prajna-ai.onrender.com/register", dataToSend);
+        const response = await axios.post("http://localhost:5000/register", dataToSend);
         
         if(response.status === 201){
             setTimeout(() => {
@@ -234,7 +234,7 @@ export default function SignUpForm() {
           >
             Submit
           </Button>
-          {submitted && (
+          {/* {submitted && (
                     <div className='result'>
                         <div>
                             <h2>Welcome {signUpData.name}</h2>
@@ -245,7 +245,27 @@ export default function SignUpForm() {
                             <h2>Now Please LogIn Again</h2>
                         </div>
                     </div>
-          )}
+          )} */}
+          {submitted && (
+  <div
+    style={{
+      backgroundColor: '#333',   // Dark background for contrast
+      padding: '20px',           // Padding for spacing
+      borderRadius: '10px',      // Rounded corners for a modern look
+      textAlign: 'center',       // Center align text
+    }}
+  >
+    <div>
+      <h2 style={{ color: 'white', marginBottom: '10px' }}>Welcome {signUpData.name}</h2>
+
+      <p style={{ color: 'white', marginBottom: '5px' }}>Created User with Credentials</p>
+      <p style={{ color: 'white', marginBottom: '5px' }}>Name: {signUpData.name}</p>
+      <p style={{ color: 'white', marginBottom: '20px' }}>Email: {signUpData.email}</p>
+
+      <h2 style={{ color: 'white', marginTop: '20px' }}>Now Please Log In Again</h2>
+    </div>
+  </div>
+)}
         </Box>
       </Grid>
 
