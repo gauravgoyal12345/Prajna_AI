@@ -1,20 +1,34 @@
 /* Full-screen black background */
 .landing-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    background-color: black;
-  }
-  
-  /* Gradient text styling */
-  .typing-effect span {
-    background: linear-gradient(to right, #567350, #e6f4e4);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    text-fill-color: transparent;
-    font-size: 100px;
-    font-family: 'Courier New', Courier, monospace;
-  }
-  
+  display: flex;
+  flex-direction: column; /* Ensure vertical stacking of elements */
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: black;
+  gap: 30px; /* Add spacing between the heading and the meet-team section */
+}
+
+/* Gradient text styling for the typing effect */
+.typing-effect span {
+background: linear-gradient(to right, #567350, #e6f4e4);
+-webkit-background-clip: text;
+-webkit-text-fill-color: transparent;
+background-clip: text;
+text-fill-color: transparent;
+font-size: 200px; /* Font size for the first heading */
+font-family: 'Courier New', Courier, monospace;
+text-align: center; /* Center align the text */
+}
+
+/* Gradient text styling for the "Meet Our Team" section */
+.meet-team {
+background: linear-gradient(to right, #567350, #e6f4e4);
+-webkit-background-clip: text;
+-webkit-text-fill-color: transparent;
+background-clip: text;
+text-fill-color: transparent;
+font-size: 100px; /* Adjust font size for the second heading */
+font-family: 'Courier New', Courier, monospace;
+text-align: center;
+}

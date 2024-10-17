@@ -37,7 +37,7 @@ function PdfUpload() {
     <div className="upload-container">
       <label htmlFor="file-upload" className="custom-file-upload">
         <i className="upload-icon">&#8682;</i>  {/* Simple upload icon */}
-        {!isSubmitted ? 'Upload PDF files' : 'Uploading...'}
+        {!isSubmitted ? 'Upload PDF files' : 'PDF Files Uploaded'}
       </label>
       <input
         id="file-upload"

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import '../Style/Chatbot.css';
 import axios from 'axios';
 import { Alert } from "antd";
@@ -6,7 +6,6 @@ import { TypeAnimation } from 'react-type-animation'; // Import TypeAnimation
 
 function Chatbot() {
   const [input, setInput] = useState('');
-  const [isTyping, setIsTyping] = useState(false);
   const [messages, setMessages] = useState([]);
   const [botResponse, setBotResponse] = useState('');
   const chatWindowRef = useRef(null);
@@ -30,29 +29,27 @@ function Chatbot() {
       return;
     }
 
-    try {
-      const newMessages = [...messages, { sender: "user", text: input }];
-      setMessages(newMessages);
-      setInput('');
-      setIsTyping(true);
+    // User's message is added to the messages array
+    const newMessages = [...messages, { sender: "user", text: input }];
+    setMessages(newMessages);
+    setInput('');
 
-      // Simulate a delay for bot response
-      await new Promise(resolve => setTimeout(resolve, 2000)); // 2 seconds delay
+    // Simulate a delay for bot response
+    await new Promise(resolve => setTimeout(resolve, 1000)); // 1 second delay
 
-      // Simulated bot response
-      const responseText = "I am here to help"; 
-      setBotResponse(responseText);
+    // Simulated bot response
+    const responseText = "I am here to help"; 
+    setBotResponse(responseText);
+  };
 
-      // Update messages state
-      const updatedMessages = [
-        ...newMessages, 
-        { sender: "bot", text: responseText }
-      ];
-      setMessages(updatedMessages);
-      setIsTyping(false);
-    } catch (error) {
-      console.log(error);
-    }
+  // Function to add bot response to messages after animation finishes
+  const addBotResponseToMessages = () => {
+    const updatedMessages = [
+      ...messages,
+      { sender: "bot", text: botResponse }
+    ];
+    setMessages(updatedMessages);
+    setBotResponse(''); // Clear botResponse after it's added to messages
   };
 
   const handleKeyDown = (e) => {
@@ -78,22 +75,21 @@ function Chatbot() {
               )}
             </div>
           ))}
-          {isTyping && (
-            <div className="message bot-message">
-              <p><i>Typing...</i></p>
-            </div>
-          )}
-          {/* Display the bot's response with type animation */}
-          {botResponse && !isTyping && (
+          {/* Display the bot's response with TypeAnimation */}
+          {botResponse && (
             <div className="message bot-message">
               <TypeAnimation
                 sequence={[
                   botResponse,   // String to display
-                  2000,          // Delay in ms before next action (stay on message for 2 seconds)
+                  2000,          // Stay on the message for 2 seconds
+                  () => {
+                    // After animation, add the message to the state
+                    addBotResponseToMessages();
+                  },
                 ]}
                 wrapper="span"
-                speed={50}      // Animation speed (ms per character)
-                repeat={0}      // Repeat the animation
+                speed={10}       // Instant display (no typing effect)
+                repeat={0}      // Don't repeat the animation
               />
             </div>
           )}
