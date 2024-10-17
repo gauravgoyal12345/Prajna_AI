@@ -1,16 +1,27 @@
 import * as React from 'react';
 import "../Style/pdfUpload.css";
 import axios from 'axios';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 function PdfUpload() {
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [sessionID, setSessionID] = useState('');
+
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem('userDetails'));
+    if (user) {
+      setSessionID(user.uid);
+    }
+  }, []);
 
   const handleFileUpload = async (event) => {
     const files = event.target.files;
 
     if (files.length > 0) {
       const formData = new FormData();
+      // Append session ID to form data
+      formData.append('sessionID', sessionID);
+
       for (let i = 0; i < files.length; i++) {
         formData.append('pdfs', files[i]);
       }
