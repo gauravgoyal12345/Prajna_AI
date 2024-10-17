@@ -41,10 +41,14 @@ The goal of PDFGenie is to build an Intelligent PDF Querying System (IPQS) with 
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/your-username/PDFGenie.git
-   cd PDFGenie
+   git clone https://github.com/your-username/Prajna_AI.git
+   cd Prajna_AI
 
-2. **Install dependencies**
+2. **Install React dependencies**
+    ```bash
+    npm i
+
+3. **Install Backend dependencies**
    ```bash
    cd backend
    pip install -r requirements.txt
@@ -52,8 +56,17 @@ The goal of PDFGenie is to build an Intelligent PDF Querying System (IPQS) with 
 3. **Set up MongoDB**
     Ensure you have MongoDB running locally or use a cloud-based MongoDB instance.
 
-4. **Access the frontend**
-    Navigate to http://localhost:5000 in your web browser to use the application.
+4. **Start the frontend**
+    ```bash
+    npm start
+
+5. **Start the backend**
+    ```bash
+    cd backend
+    python app.py
+
+6. **Access the frontend**
+    Navigate to http://localhost:3000 in your web browser to use the application.
 
 ## Technologies Used
 
