@@ -5,4 +5,4 @@ langchain_core
 langchain
 langchain_google_genai
 langchain_community
-langchain_quadrant
+langchain_qdrant
