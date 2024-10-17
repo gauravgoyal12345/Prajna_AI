@@ -5,6 +5,7 @@ from PyPDF2 import PdfReader
 from io import BytesIO
 from flask_pymongo import PyMongo, ObjectId
 from question_reccomender import summarize_pdf
+from rag import get_ans
 from datetime import datetime
 import bcrypt
 from pymongo import MongoClient
@@ -177,7 +178,7 @@ def handle_user_query():
     session_id = data['session_id']
 
     # Call the LLM to get the answer to the user's question
-    answer = query_llm_model(question, session_id)
+    answer = get_ans(question, session_id)
 
     return jsonify({"msg": "Query handled successfully", "question": question, "answer": answer}), 200
 
