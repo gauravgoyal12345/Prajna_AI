@@ -1,0 +1,18 @@
+.rounded-button {
+    display: inline-block;
+    padding: 12px 24px;
+    background-color: green;
+    color: white !important;
+    text-align: center;
+    text-decoration: none;
+    font-size: 16px;
+    border-radius: 30px; /* For a circular look */
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+  
+.rounded-button:hover {
+    background-color: darkgreen; /* Darken the color on hover */
+}
+  

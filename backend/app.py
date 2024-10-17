@@ -1,3 +1,14 @@
+
+print("Running app.py and not app(1).py")
+
+import pkg_resources
+
+installed_packages = pkg_resources.working_set
+print("Installed packages:")
+for package in installed_packages:
+    print(package)
+
+
 from flask import Flask, request, jsonify
 import os
 from flask_cors import CORS

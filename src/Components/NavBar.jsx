@@ -2,6 +2,9 @@ import React from "react";
 import '../Style/NavBarStyle.css';
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
+import RoundedButton from "./RoundedButton";
+import LogOut from "./Logout";
+
 function Navbar() {
     const [logOut, setLogOut] = useState(false);
     useEffect(() => {
@@ -15,25 +18,22 @@ function Navbar() {
         <div className="custom-navbar">
             <div className="custom-nav-left">
                 <ul className="custom-nav-links">
-                    <li><Link to="/">Home</Link></li>
-
+                    <RoundedButton routeLink = "/" label = "Home"/>
                 </ul>
             </div>
             <div className="custom-nav-right">
                 <ul className="custom-nav-links">
                     {logOut && 
                     <>
-                        <li><Link to="/chatbot">Noira</Link></li>
-                        <li><Link to="/rag">MindSage</Link></li>
-                        <li><Link to="/diary">Diary</Link></li>
+                        <RoundedButton routeLink = "/upload" label = "PDF Genie"/>           
                     </>}
                     { !logOut &&
                     <>
-                        <li><Link to="/login">Login</Link></li>
-                        <li><Link to="/signup">Sign Up</Link></li>
+                        <RoundedButton routeLink = "/login" label = "LogIn"/>  
+                        <RoundedButton routeLink = "/signUp" label = "SignUp"/>  
                     </>
                     }
-                    {logOut && <li><Link to="/logout">Logout</Link></li> }
+                    {logOut && <LogOut/>  }
                 </ul>
             </div>
         </div>
