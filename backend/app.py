@@ -113,23 +113,26 @@ def upload_files():
     files = request.files.getlist('pdfs')
     if not files:
         return jsonify({'error': 'No files uploaded'}), 400
-    
-    
 
-    # List to store file paths of successfully saved PDFs
+    # Extract session_id from form data (not JSON)
+    session_id = request.form.get('session_id')
+    if not session_id:
+        return jsonify({'error': 'Session ID is required'}), 400
+
+    # Process PDF files and extract text
     pdfchunks = get_pdf_text(files)
     splitchunks = get_text_chunks(pdfchunks)
+    
     documents_with_metadata = [
-    Document(page_content=split['text'], metadata={
-        'page_num': split['page_num'],
-        'paragraph_num': split['paragraph_num'],
-        'source_pdf': split['source_pdf']
-    })
-    for split in splitchunks
-]
-    data = request.json
+        Document(page_content=split['text'], metadata={
+            'page_num': split['page_num'],
+            'paragraph_num': split['paragraph_num'],
+            'source_pdf': split['source_pdf']
+        })
+        for split in splitchunks
+    ]
 
-    session_id = data['session_id']
+    # Store documents in vector store using session_id as collection name
     vectorstore = QdrantVectorStore.from_documents(
         documents_with_metadata,
         embeddings,
@@ -137,12 +140,12 @@ def upload_files():
         prefer_grpc=True,
         api_key=api_key,
         collection_name=session_id,
-        )
+    )
 
-    
     file_paths = []
     filetext = ""
-    i =1
+    i = 1
+
     for file in files:
         if file and file.filename.endswith('.pdf'):  # Check if it's a valid PDF file
             # Save the file to the UPLOAD_FOLDER
@@ -150,15 +153,20 @@ def upload_files():
             file_content = BytesIO(file.read())
             file.save(filename)
             file_paths.append(filename)
-            text = extract_text(file_content)
-            filetext=filetext+"\n\n pdf number "+str(i) + "\n\n"
-            filetext+=text
-            i= i+1
 
+            # Extract text from PDF
+            text = extract_text(file_content)
+            filetext += f"\n\n pdf number {i} \n\n"
+            filetext += text
+            i += 1
         else:
             return jsonify({'error': 'Invalid file type. Only PDF files are allowed.'}), 400
-    print(filetext)    
-    result=question_recc(filetext)
+
+    print(filetext)
+    
+    # Generate recommended questions based on the extracted PDF text
+    result = question_recc(filetext)
+
     return jsonify({'message': result}), 200
 
 @app.route("/register", methods=['POST'])
