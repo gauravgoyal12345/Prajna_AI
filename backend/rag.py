@@ -16,6 +16,9 @@ from qdrant_client import QdrantClient
 from qdrant_client.http.models import Distance, VectorParams
 import os
 import getpass
+from dotenv import load_dotenv
+load_dotenv()
+
 
 from langchain_text_splitters import CharacterTextSplitter
 from langchain.docstore.document import Document
@@ -23,12 +26,13 @@ import PyPDF2
 from qdrant_client import QdrantClient
 
 
-url="https://20d082e7-30a1-48fa-a9d6-d69050d13930.europe-west3-0.gcp.cloud.qdrant.io:6333"
-api_key="aDrIs3VHfe4LmqOJlDx3roh1FlgE7cjiZFSdsp5BvizeOOsbJZz5pg"
+url=os.getenv('url')
+
+api_key=os.getenv('api_key')
 
 client = QdrantClient(
-    url="https://20d082e7-30a1-48fa-a9d6-d69050d13930.europe-west3-0.gcp.cloud.qdrant.io:6333", 
-    api_key="aDrIs3VHfe4LmqOJlDx3roh1FlgE7cjiZFSdsp5BvizeOOsbJZz5pg",
+    url=url, 
+    api_key=api_key,
 )
 
 # print(qdrant_client.get_collections())
@@ -46,11 +50,15 @@ def split_text(text):
     return documents
 
 
-if "GOOGLE_API_KEY" not in os.environ:
-    os.environ["GOOGLE_API_KEY"] = getpass.getpass("api-key")
 
-llm = ChatGoogleGenerativeAI(model="gemini-1.5-flash")
-embeddings = GoogleGenerativeAIEmbeddings(model="models/embedding-001")
+# Access the API key
+api_key = os.getenv('GOOGLE_API_KEY')
+
+# if "GOOGLE_API_KEY" not in os.environ:
+#     os.environ["GOOGLE_API_KEY"] = getpass.getpass("api-key")
+
+llm = ChatGoogleGenerativeAI(api_key = api_key,model="gemini-1.5-flash")
+embeddings = GoogleGenerativeAIEmbeddings(api_key=api_key,model="models/embedding-001")
 
 
 # Path to the PDF file
@@ -218,4 +226,3 @@ def get_ans(question,collection_name):
 
 
 
-# AIzaSyAQS7AkkwmTYJ8GXjbqM0PgfZ_iZS-BDG0

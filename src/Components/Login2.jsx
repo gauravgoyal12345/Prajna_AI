@@ -8,12 +8,10 @@ import axios from 'axios';
 import bgImg from "../Assets/bg3.avif"; // Make sure the path to the image is correct
 import {useNavigate } from 'react-router-dom';
 const validator = require('validator');
-export default function SignUpForm() {
-  const [signUpData, setSignUpData] = useState({
-    name: '',
+export default function LogInForm() {
+  const [loginData, setLogInData] = useState({
     email: '',
-    password: '',
-    confirmPassword: ''
+    password: ''
   });
   const navigate = useNavigate();
   const [emptyField, setEmptyFieldAlert] = useState(false);
@@ -22,7 +20,7 @@ export default function SignUpForm() {
   const [submitted, setSubmitted] = useState(false);
   const handleSignUpChange = (e) => {
     const { name, value } = e.target;
-    setSignUpData((prevState) => ({
+    setLogInData((prevState) => ({
       ...prevState,
       [name]: value // Store value as-is
     }));
@@ -41,36 +39,30 @@ export default function SignUpForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (signUpData.name.trim() === '' || signUpData.email.trim() === '' || signUpData.password.trim() === '' || signUpData.confirmPassword.trim() === '') {
+    if (loginData.email.trim() === '' || loginData.password.trim() === '' ) {
         setEmptyFieldAlert(true);
         setAlertMessage("Please Fill all the details");
         return;
     }
-    if(!validator.isEmail(signUpData.email)){
+    if(!validator.isEmail(loginData.email)){
         setIncorrectFieldAlert(true);
         setAlertMessage("Please check the credentials");
         return;
     }
-    if(signUpData.password.trim().length < 6){
+    if(loginData.password.trim().length < 6){
         setEmptyFieldAlert(true);
         setAlertMessage("The password length should be greater than 5");
-        return;
-    }
-    if(signUpData.password !== signUpData.confirmPassword){
-        setIncorrectFieldAlert(true);
-        setAlertMessage("Confirm Password and Password both are not same");
         return;
     }
     
     try {
         // Create a copy of signUpData excluding ConfirmPassword
-        const {confirmPassword, ...dataToSend} = signUpData;
         setSubmitted(true);
-        const response = await axios.post("http://localhost:5000/register", dataToSend);
+        const response = await axios.post("http://localhost:5000/register", loginData);
         
         if(response.status === 201){
             setTimeout(() => {
-                navigate('/login');
+                navigate('/');
             }, 1000); // Delay of 3000ms (3 seconds)
         }
     } 
@@ -111,41 +103,15 @@ export default function SignUpForm() {
           }}
         >
           <Typography variant="h5" component="h1" align="center" sx={{ mb: 2, color: '#e6f4e4' }}>
-            User Signup Form
+            User LogIn Form
           </Typography>
-
-          <TextField
-            name='name'
-            label='Name'
-            variant='outlined'
-            value={signUpData.name}
-            onChange={handleSignUpChange}
-            error={emptyField}
-            helperText={emptyField && "This field cannot be empty"}
-            sx={{
-              input: { color: '#e6f4e4' },
-              fieldset: { borderColor: '#567350' },
-              '& .MuiInputLabel-root': { color: '#e6f4e4' }, // Label color
-              '& .MuiInputLabel-root.Mui-focused': { color: '#e6f4e4' }, // Label focus color
-              '& input::placeholder': { color: 'white' } // Placeholder color
-            }}
-            InputLabelProps={{
-              style: { color: 'white' } // Label color
-            }}
-            InputProps={{
-              style: { color: 'white' }, // Input text color
-              inputProps: {
-                style: { color: 'white' } // Placeholder color
-              }
-            }}
-          />
 
           <TextField
             name='email'
             type='email'
             label='Email Address'
             variant='outlined'
-            value={signUpData.email}
+            value={loginData.email}
             onChange={handleSignUpChange}
             error={emptyField}
             helperText={emptyField && "This field cannot be empty"}
@@ -172,37 +138,10 @@ export default function SignUpForm() {
             type='password'
             label='Password'
             variant='outlined'
-            value={signUpData.password}
+            value={loginData.password}
             onChange={handleSignUpChange}
             error={emptyField}
             helperText={emptyField && "This field cannot be empty"}
-            sx={{
-              input: { color: '#e6f4e4' },
-              fieldset: { borderColor: '#567350' },
-              '& .MuiInputLabel-root': { color: '#e6f4e4' }, // Label color
-              '& .MuiInputLabel-root.Mui-focused': { color: '#e6f4e4' }, // Label focus color
-              '& input::placeholder': { color: 'white' } // Placeholder color
-            }}
-            InputLabelProps={{
-              style: { color: 'white' } // Label color
-            }}
-            InputProps={{
-              style: { color: 'white' }, // Input text color
-              inputProps: {
-                style: { color: 'white' } // Placeholder color
-              }
-            }}
-          />
-
-          <TextField
-            name='confirmPassword'
-            type='password'
-            label='Confirm Password'
-            variant='outlined'
-            value={signUpData.confirmPassword}
-            onChange={handleSignUpChange}
-            error={emptyField || incorrectField}
-            helperText={(emptyField && "This field cannot be empty") || (incorrectField && "Passwords do not match")}
             sx={{
               input: { color: '#e6f4e4' },
               fieldset: { borderColor: '#567350' },
@@ -237,11 +176,11 @@ export default function SignUpForm() {
           {submitted && (
                     <div className='result'>
                         <div>
-                            <h2>Welcome {signUpData.name}</h2>
+                            <h2>Welcome {loginData.name}</h2>
                             
                             <p> Created User with Credentials</p>
-                            <p>Name: {signUpData.name}</p>
-                            <p>Email: {signUpData.email}</p>
+                            <p>Name: {loginData.name}</p>
+                            <p>Email: {loginData.email}</p>
                             <h2>Now Please LogIn Again</h2>
                         </div>
                     </div>

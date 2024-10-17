@@ -5,11 +5,20 @@ from langchain.schema import StrOutputParser
 from langchain_google_genai import ChatGoogleGenerativeAI
 import os
 import getpass
+from dotenv import load_dotenv
+load_dotenv()
 
-if "GOOGLE_API_KEY" not in os.environ:
-    os.environ["GOOGLE_API_KEY"] = getpass.getpass("api_key")
 
-google_llm = ChatGoogleGenerativeAI(model="gemini-1.5-flash")
+
+api_key = os.getenv('GOOGLE_API_KEY')
+
+# if "GOOGLE_API_KEY" not in os.environ:
+#     os.environ["GOOGLE_API_KEY"] = getpass.getpass("api-key")
+
+google_llm = ChatGoogleGenerativeAI(api_key = api_key,model="gemini-1.5-flash")
+# embeddings = GoogleGenerativeAIEmbeddings(api_key,model="models/embedding-001")
+
+# google_llm = ChatGoogleGenerativeAI(model="gemini-1.5-flash")
 
 
 def get_summarization_chain(text):
