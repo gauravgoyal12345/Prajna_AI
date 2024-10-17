@@ -14,8 +14,7 @@ google_llm = ChatGoogleGenerativeAI(model="gemini-1.5-flash")
 
 def get_summarization_chain(text):
     llm = google_llm
-    prompt_template = """Based on given text from a pdf, extract 5 questions that user may want to ask from it,
-    only questions, nothing else.
+    prompt_template = """Create a concise summary of the text passed.
 "{text}"
 questions:"""
     prompt = PromptTemplate.from_template(prompt_template)
@@ -26,7 +25,7 @@ questions:"""
         | StrOutputParser()  # Output parser
    )
 
-def question_recc(text):
+def generate_summary(text):
     # Load PDF and extract text
     
 
