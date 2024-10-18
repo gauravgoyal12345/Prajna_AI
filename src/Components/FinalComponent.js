@@ -41,7 +41,7 @@ function FinalComponents() {
       }
 
       try {
-        const response = await axios.post('http://localhost:5000/upload', formData, {
+        const response = await axios.post('https://prajna-ai.onrender.com/upload', formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
           },
@@ -104,7 +104,7 @@ function FinalComponents() {
   
       // Simulate a delay for bot response
       const userRagChatData = { email: userData.email, question: message, session_id: userData.uid };
-      const response = await axios.post("http://localhost:5000/handle_query", userRagChatData);
+      const response = await axios.post("https://prajna-ai.onrender.com/handle_query", userRagChatData);
   
       if (response.status === 200) {
         const botResponse = response.data.answer;
