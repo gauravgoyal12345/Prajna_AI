@@ -55,7 +55,7 @@ function Login() {
         }
         try {
             setSubmitted(true);
-            const response = await axios.post("https://prajna-ai.onrender.com/login", loginData);
+            const response = await axios.post("http://localhost:5000/login", loginData);
             if(response.status === 200){
                 localStorage.setItem('userDetails', JSON.stringify(response.data.user));
                 

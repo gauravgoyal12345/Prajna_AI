@@ -62,7 +62,7 @@ export default function LogInForm() {
     try {
         // Create a copy of signUpData excluding ConfirmPassword
         setSubmitted(true);
-        const response = await axios.post("https://prajna-ai.onrender.com/login", loginData);
+        const response = await axios.post("http://localhost:5000/login", loginData);
         
         if(response.status === 200){
             let userData = response.data.user;

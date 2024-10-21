@@ -66,7 +66,7 @@ export default function SignUpForm() {
         // Create a copy of signUpData excluding ConfirmPassword
         const {confirmPassword, ...dataToSend} = signUpData;
         setSubmitted(true);
-        const response = await axios.post("https://prajna-ai.onrender.com/register", dataToSend);
+        const response = await axios.post("http://localhost:5000/register", dataToSend);
         
         if(response.status === 201){
             setTimeout(() => {
