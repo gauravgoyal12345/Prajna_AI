@@ -5,6 +5,8 @@ import '../Style/CombinedLayout.css'; // Combined styles
 import axios from 'axios';
 import { Alert } from "antd";
 import { TypeAnimation } from 'react-type-animation';
+import MicIcon from '@mui/icons-material/Mic';
+import StopIcon from '@mui/icons-material/Stop';
 
 function FinalComponents() {
 
@@ -19,6 +21,7 @@ function FinalComponents() {
   const [userData, setUserData] = useState([]);
   const [responseQuestions, setResponseQuestions] = useState([]); // New state for response questions
   const [sessionID, setSessionID] = useState('');
+  const [isListening, setIsListening] = useState(false);
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem('userDetails'));
@@ -52,8 +55,8 @@ function FinalComponents() {
           const questions = response.data.message
             .split('\n')
             .filter(question => question.trim() !== '');
-            
-            setUserQuestions(questions);
+
+          setUserQuestions(questions);
         }
 
         console.log('Upload success:', response.data);
@@ -73,7 +76,7 @@ function FinalComponents() {
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem('userDetails'));
     if (user) {
-        setUserData(user)
+      setUserData(user)
     }
   }, []);  // Dependency array to watch changes in userQuestions
 
@@ -91,37 +94,37 @@ function FinalComponents() {
 
   const handleSendMessage = async (messageToSend) => {
     const message = messageToSend || input;  // Use clicked question or user input
-  
+
     if (message.trim() === '') {
       setEmptyFieldAlert(true);
       return;
     }
-    
+
     try {
       const newMessages = [...messages, { sender: "user", text: message }];
       setMessages(newMessages);
       setInput('');  // Clear input only for manual input case
-  
+
       // Simulate a delay for bot response
       const userRagChatData = { email: userData.email, question: message, session_id: userData.uid };
       const response = await axios.post("http://localhost:5000/handle_query", userRagChatData);
-  
+
       if (response.status === 200) {
         const botResponse = response.data.answer;
         const botCitations = response.data.citations;
-  
+
         const updatedMessages = [
           ...newMessages,
           { sender: "bot", text: botResponse, citations: botCitations }  // Include citations
         ];
-  
+
         setMessages(updatedMessages);  // Update messages state with bot response and citations
       }
     } catch (error) {
       console.log(error);
     }
   };
-  
+
 
   const handleQuestionClick = (question) => {
     handleSendMessage(question.text);  // Send the clicked question
@@ -142,6 +145,38 @@ function FinalComponents() {
       e.preventDefault();
       handleSendMessage();
     }
+  };
+  // Voice Input!!
+  const handleMicClick = () => {
+    if (isListening) {
+      recognition.stop(); // Stop listening if it's already listening
+      setIsListening(false);
+    } else {
+      recognition.start(); // Start listening for voice input
+      setIsListening(true);
+    }
+  };
+
+  // Web Speech API setup for voice recognition
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const recognition = new SpeechRecognition();
+
+  recognition.continuous = true;
+  recognition.interimResults = true;
+  recognition.lang = 'en-US';
+
+  recognition.onresult = (event) => {
+    let interimTranscript = '';
+    for (let i = event.resultIndex; i < event.results.length; i++) {
+      const transcript = event.results[i][0].transcript;
+      interimTranscript += transcript;
+    }
+    setInput(interimTranscript);
+  };
+
+  recognition.onerror = (event) => {
+    console.error('Speech recognition error:', event.error);
+    setIsListening(false);
   };
 
   return (
@@ -164,20 +199,20 @@ function FinalComponents() {
           <div className="recommended-questions">
             <h3>Recommended Questions</h3>
             {responseQuestions.length > 0 && <ul>
-                {responseQuestions.map((question, index) => (
+              {responseQuestions.map((question, index) => (
                 <li key={index} onClick={() => handleQuestionClick({ text: question.text })}>
-                    {question.text}  
+                  {question.text}
                 </li>
-                ))}
+              ))}
             </ul>}
-        </div>
+          </div>
         </div>
       </div>
       <div className="right-container">
         <div className='external-chatbot-container'>
           <div className="chatbot-container">
 
-          <div className="chat-window" ref={chatWindowRef}>
+            <div className="chat-window" ref={chatWindowRef}>
               {messages && messages.map((msg, index) => (
                 <div
                   key={index}
@@ -205,28 +240,28 @@ function FinalComponents() {
                           </ul>
                         </div>
                       )} */}
-                     {msg.citations && msg.citations.length > 0 && (
-  <div className="citations">
-    <h4>Citations:</h4>
-    <ul>
-      {[...new Set(
-        msg.citations
-          .filter(citation => citation.source_pdf.endsWith('.pdf'))  // Exclude sources not ending with '.pdf'
-          .map(JSON.stringify)  // Stringify for unique set filtering
-      )].map((citation, index) => {
-        const parsedCitation = JSON.parse(citation);
-        const source = parsedCitation.source_pdf !== 'pdfs' 
-                        ? parsedCitation.source_pdf 
-                        : 'PDF File';  // Handle 'pdfs' as 'Unknown Source'
-        return (
-          <li key={index}>
-            {`Page ${parsedCitation.page_num}, Paragraph ${parsedCitation.paragraph_num}, Source: ${source}`}
-          </li>
-        );
-      })}
-    </ul>
-  </div>
-)}
+                      {msg.citations && msg.citations.length > 0 && (
+                        <div className="citations">
+                          <h4>Citations:</h4>
+                          <ul>
+                            {[...new Set(
+                              msg.citations
+                                .filter(citation => citation.source_pdf.endsWith('.pdf'))  // Exclude sources not ending with '.pdf'
+                                .map(JSON.stringify)  // Stringify for unique set filtering
+                            )].map((citation, index) => {
+                              const parsedCitation = JSON.parse(citation);
+                              const source = parsedCitation.source_pdf !== 'pdfs'
+                                ? parsedCitation.source_pdf
+                                : 'PDF File';  // Handle 'pdfs' as 'Unknown Source'
+                              return (
+                                <li key={index}>
+                                  {`Page ${parsedCitation.page_num}, Paragraph ${parsedCitation.paragraph_num}, Source: ${source}`}
+                                </li>
+                              );
+                            })}
+                          </ul>
+                        </div>
+                      )}
 
                     </>
                   ) : (
@@ -245,6 +280,9 @@ function FinalComponents() {
                 placeholder="Type your message..."
                 rows={1}
               />
+              <button className="mic-button" onClick={handleMicClick}>
+                {isListening ? <StopIcon /> : <MicIcon />}
+              </button>
               <button className='chat-button' onClick={() => handleSendMessage()}>Send</button>
             </div>
           </div>
