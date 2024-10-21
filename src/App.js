@@ -15,7 +15,6 @@ function App() {
           <Route path='/login' element = {<LogInForm/>}/>
           <Route path='/signUp' element = {<SignUpForm/>}/>
           <Route path='/upload' element = {<FinalComponents/>}/>
-
         </Routes>
       </BrowserRouter>
   );

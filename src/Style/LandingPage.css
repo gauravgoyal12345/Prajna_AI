@@ -1,39 +1,97 @@
 /* Full-screen black background */
-html, body {
+html,
+body {
   height: 100%;
   margin: 0;
   padding: 0;
+  background-color: black;
+  color: white; /* Ensures all text is white */
+  overflow-x: hidden; /* Prevent horizontal scroll */
 }
+
+/* Main container that holds the landing page content */
 .landing-container {
   display: flex;
-  flex-direction: column; /* Ensure vertical stacking of elements */
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   height: calc(100vh - 7vh);
   background-color: black;
-  /* Add spacing between the heading and the meet-team section */
+  text-align: center;
+  margin-top: 100px;
 }
 
-/* Gradient text styling for the typing effect */
+/* Styling for the typing effect text */
 .typing-effect span {
-background: linear-gradient(to right, #567350, #e6f4e4);
--webkit-background-clip: text;
--webkit-text-fill-color: transparent;
-background-clip: text;
-text-fill-color: transparent;
-font-size: 200px; /* Font size for the first heading */
-font-family: 'Courier New', Courier, monospace;
-text-align: center; /* Center align the text */
+  background: linear-gradient(to right, #567350, #e6f4e4);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-fill-color: transparent;
+  font-size: 200px;
+  font-family: 'Courier New', Courier, monospace;
 }
 
-/* Gradient text styling for the "Meet Our Team" section */
-.meet-team {
-background: linear-gradient(to right, #567350, #e6f4e4);
--webkit-background-clip: text;
--webkit-text-fill-color: transparent;
-background-clip: text;
-text-fill-color: transparent;
-font-size: 100px; /* Adjust font size for the second heading */
-font-family: 'Courier New', Courier, monospace;
-text-align: center;
+/* Team container for displaying team member cards */
+.team-container {
+  display: flex;
+  flex-wrap: wrap; /* Allow cards to wrap to the next line */
+  justify-content: center; /* Center the cards */
+  padding: 20px; /* Padding around the container */
+}
+
+/* Card styling */
+.card {
+  background-color: #6b6b6b;/* Dark background for cards */
+  border-radius: 8px; /* Rounded corners */
+  padding: 20px; /* Inner spacing */
+  margin: 10px; /* Space around cards */
+  width: calc(33.33% - 20px); /* Set width to one-third minus margin */
+  transition: transform 0.3s; /* Animation on hover */
+  text-align: center; /* Center text inside the card */
+}
+
+.card img {
+  width: 100%; /* Full width */
+  height: auto; /* Maintain aspect ratio */
+  border-radius: 8px; /* Rounded corners for images */
+  margin-bottom: 10px; /* Space between image and text */
+}
+
+.card:hover {
+  transform: scale(1.05); /* Slightly enlarge on hover */
+}
+
+/* Icons for LinkedIn and GitHub */
+.social-icons {
+  display: flex;
+  justify-content: center; /* Center icons */
+  margin-top: 10px; /* Space above icons */
+}
+
+.social-icons a {
+  margin: 0 10px; /* Space between icons */
+  color: white; /* Icon color */
+  font-size: 24px; /* Size of the icons */
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .typing-effect span {
+    font-size: 150px; /* Adjust font size for smaller screens */
+  }
+
+  .card {
+    width: calc(45% - 20px); /* Two cards fit in a row */
+  }
+}
+
+@media (max-width: 480px) {
+  .typing-effect span {
+    font-size: 100px; /* Smaller font size for mobile */
+  }
+
+  .card {
+    width: calc(90% - 20px); /* Full width on mobile */
+  }
 }
