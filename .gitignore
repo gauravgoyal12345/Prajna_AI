@@ -25,3 +25,5 @@ yarn-error.log*
 .env
 
 .venv 
+/backend/result.csv
+/backend/pandasai.log
