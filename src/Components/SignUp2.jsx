@@ -9,6 +9,7 @@ import bgImg from "../Assets/bg3.avif"; // Make sure the path to the image is co
 import { LoadingOutlined } from '@ant-design/icons';
 import { Flex, Spin} from 'antd';
 import {useNavigate } from 'react-router-dom';
+import { ToastContainer, toast } from 'react-toastify';
 const validator = require('validator');
 export default function SignUpForm() {
   const [signUpData, setSignUpData] = useState({
@@ -50,23 +51,27 @@ export default function SignUpForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (signUpData.name.trim() === '' || signUpData.email.trim() === '' || signUpData.password.trim() === '' || signUpData.confirmPassword.trim() === '') {
-        setEmptyFieldAlert(true);
-        setAlertMessage("Please Fill all the details");
+        // setEmptyFieldAlert(true);
+        // setAlertMessage("Please Fill all the details");
+        toast.error("Please fill all the details", { position: "top-center" });
         return;
     }
     if(!validator.isEmail(signUpData.email)){
-        setIncorrectFieldAlert(true);
-        setAlertMessage("Please check the credentials");
+        // setIncorrectFieldAlert(true);
+        // setAlertMessage("Please check the credentials");
+        toast.warning("Please check the credentials", { position: "top-center" });
         return;
     }
     if(signUpData.password.trim().length < 6){
-        setEmptyFieldAlert(true);
-        setAlertMessage("The password length should be greater than 5");
+        // setEmptyFieldAlert(true);
+        // setAlertMessage("The password length should be greater than 5");
+        toast.info("The password length should be greater than 5", { position: "top-center" });
         return;
     }
     if(signUpData.password !== signUpData.confirmPassword){
-        setIncorrectFieldAlert(true);
-        setAlertMessage("Confirm Password and Password both are not same");
+        // setIncorrectFieldAlert(true);
+        // setAlertMessage("Confirm Password and Password both are not same");
+        toast.error("Confirm Password and Password both are not the same", { position: "top-center" });
         return;
     }
     
@@ -78,20 +83,25 @@ export default function SignUpForm() {
         const response = await axios.post("http://localhost:5000/register", dataToSend);
         
         if(response.status === 201){
+          toast.success("Registration Successful! Redirecting to Login...", { position: "top-center" });
             setTimeout(() => {
                 navigate('/login');
-            }, 500); // Delay of 3000ms (3 seconds)
+            }, 3000); // Delay of 3000ms (3 seconds)
             setLoadingState(false);
         }
     } 
     catch (error) {
         console.log(error);
-        setIncorrectFieldAlert(true);
-        setAlertMessage("Error at Registering User");
+        // setIncorrectFieldAlert(true);
+        // setAlertMessage("Error at Registering User");
+        toast.error("Error at Registering User", { position: "top-center" });
     }
   };
 
   return (
+    <>
+    <ToastContainer />
+
     <Grid
       container
       justifyContent="center" // Center items horizontally
@@ -277,5 +287,6 @@ export default function SignUpForm() {
       </Grid>
 
     </Grid>
+    </>
   );
 }
