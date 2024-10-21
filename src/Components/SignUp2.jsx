@@ -6,6 +6,8 @@ import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import axios from 'axios';
 import bgImg from "../Assets/bg3.avif"; // Make sure the path to the image is correct
+import { LoadingOutlined } from '@ant-design/icons';
+import { Flex, Spin} from 'antd';
 import {useNavigate } from 'react-router-dom';
 const validator = require('validator');
 export default function SignUpForm() {
@@ -20,6 +22,7 @@ export default function SignUpForm() {
   const [incorrectField, setIncorrectFieldAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
   const [submitted, setSubmitted] = useState(false);
+  const [loadingState, setLoadingState] = useState(false);
   const handleSignUpChange = (e) => {
     const { name, value } = e.target;
     setSignUpData((prevState) => ({
@@ -37,6 +40,11 @@ export default function SignUpForm() {
     if (alertMessage) {
       setAlertMessage('');
     }
+  };
+
+  const spinnerStyle = {
+    color: 'white', // Spinner color
+    fontSize: 48,   // Adjust the spinner size
   };
 
   const handleSubmit = async (e) => {
@@ -64,6 +72,7 @@ export default function SignUpForm() {
     
     try {
         // Create a copy of signUpData excluding ConfirmPassword
+        setLoadingState(true);
         const {confirmPassword, ...dataToSend} = signUpData;
         setSubmitted(true);
         const response = await axios.post("http://localhost:5000/register", dataToSend);
@@ -71,7 +80,8 @@ export default function SignUpForm() {
         if(response.status === 201){
             setTimeout(() => {
                 navigate('/login');
-            }, 1000); // Delay of 3000ms (3 seconds)
+            }, 500); // Delay of 3000ms (3 seconds)
+            setLoadingState(false);
         }
     } 
     catch (error) {
@@ -234,38 +244,35 @@ export default function SignUpForm() {
           >
             Submit
           </Button>
-          {/* {submitted && (
-                    <div className='result'>
-                        <div>
-                            <h2>Welcome {signUpData.name}</h2>
-                            
-                            <p> Created User with Credentials</p>
-                            <p>Name: {signUpData.name}</p>
-                            <p>Email: {signUpData.email}</p>
-                            <h2>Now Please LogIn Again</h2>
-                        </div>
-                    </div>
-          )} */}
+                   
+          <Flex align="center" gap="middle">
+            <Spin
+              spinning={loadingState}
+              indicator={<LoadingOutlined style={spinnerStyle} spin />}
+              size="large"
+            />
+          </Flex>
+
           {submitted && (
-  <div
-    style={{
-      backgroundColor: '#333',   // Dark background for contrast
-      padding: '20px',           // Padding for spacing
-      borderRadius: '10px',      // Rounded corners for a modern look
-      textAlign: 'center',       // Center align text
-    }}
-  >
-    <div>
-      <h2 style={{ color: 'white', marginBottom: '10px' }}>Welcome {signUpData.name}</h2>
+          <div
+            style={{
+              backgroundColor: '#333',   // Dark background for contrast
+              padding: '20px',           // Padding for spacing
+              borderRadius: '10px',      // Rounded corners for a modern look
+              textAlign: 'center',       // Center align text
+            }}
+          >
+            <div>
+              <h2 style={{ color: 'white', marginBottom: '10px' }}>Welcome {signUpData.name}</h2>
 
-      <p style={{ color: 'white', marginBottom: '5px' }}>Created User with Credentials</p>
-      <p style={{ color: 'white', marginBottom: '5px' }}>Name: {signUpData.name}</p>
-      <p style={{ color: 'white', marginBottom: '20px' }}>Email: {signUpData.email}</p>
+              <p style={{ color: 'white', marginBottom: '5px' }}>Created User with Credentials</p>
+              <p style={{ color: 'white', marginBottom: '5px' }}>Name: {signUpData.name}</p>
+              <p style={{ color: 'white', marginBottom: '20px' }}>Email: {signUpData.email}</p>
 
-      <h2 style={{ color: 'white', marginTop: '20px' }}>Now Please Log In Again</h2>
-    </div>
-  </div>
-)}
+              <h2 style={{ color: 'white', marginTop: '20px' }}>Now Please Log In Again</h2>
+            </div>
+          </div>
+        )}
         </Box>
       </Grid>
 

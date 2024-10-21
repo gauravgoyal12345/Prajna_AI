@@ -6,6 +6,8 @@ import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import axios from 'axios';
 import bgImg from "../Assets/bg3.avif"; // Make sure the path to the image is correct
+import { LoadingOutlined } from '@ant-design/icons';
+import { Flex, Spin} from 'antd';
 import {useNavigate } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 const validator = require('validator');
@@ -18,10 +20,17 @@ export default function LogInForm() {
   });
 
   const navigate = useNavigate();
+  const [loadingState, setLoadingState] = useState(false);
   const [emptyField, setEmptyFieldAlert] = useState(false);
   const [incorrectField, setIncorrectFieldAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
   const [submitted, setSubmitted] = useState(false);
+
+  const spinnerStyle = {
+    color: 'white', // Spinner color
+    fontSize: 48,   // Adjust the spinner size
+  };
+
   const handleSignUpChange = (e) => {
     const { name, value } = e.target;
     setLogInData((prevState) => ({
@@ -62,6 +71,7 @@ export default function LogInForm() {
     try {
         // Create a copy of signUpData excluding ConfirmPassword
         setSubmitted(true);
+        setLoadingState(true);
         const response = await axios.post("http://localhost:5000/login", loginData);
         
         if(response.status === 200){
@@ -85,7 +95,9 @@ export default function LogInForm() {
             }
             setTimeout(() => {
                 navigate('/');
-            }, 1000); // Delay of 3000ms (3 seconds)
+                setLoadingState(false);
+            }, 3000); // Delay of 3000ms (3 seconds)
+            
         }
     } 
     catch (error) {
@@ -181,6 +193,15 @@ export default function LogInForm() {
               }
             }}
           />
+          <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+            <Flex align="center" gap="middle">
+              <Spin
+                spinning={loadingState}
+                indicator={<LoadingOutlined style={spinnerStyle} spin />}
+                size="large"
+              />
+            </Flex>
+          </div>
 
           <Button 
             variant="contained" 
