@@ -54,6 +54,24 @@ function UserProfile() {
             console.error('User email not found in local storage.');
         }
     }, []);
+
+    const handleChatClick = async (sessionId) => {
+        setLoadingState(true);
+        const response = await axios.post('http://localhost:5000/user_chat', { session_id: sessionId })
+            .then(response => {
+                const chatMessages = response.data.chatMessages;
+                
+                // Store chatMessages in localStorage
+                localStorage.setItem('chatMessages', JSON.stringify(chatMessages));
+                
+                // Optionally, you can also navigate to a different route or update UI here
+                console.log('Chat messages stored in localStorage', chatMessages);
+            })
+            .catch(error => {
+                console.error('Error fetching chat messages:', error);
+            });
+    };
+
     return (
         <div style={{ padding: '20px', textAlign: 'center' }}>
             {/* User Profile Section */}
@@ -110,6 +128,7 @@ function UserProfile() {
                         summary={chat.summary}
                         timestamp={chat.timestamp}
                         redirectUrl={`/chat/${chat.title.replace(/\s+/g, '-').toLowerCase()}`}
+                        onClick={() => handleChatClick(chat.sessionId)} 
                     />
                 ))}
             </div>
