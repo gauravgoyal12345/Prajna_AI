@@ -254,6 +254,7 @@ def upload_files():
 
             try:
                 # Upload file to S3
+                pdf.seek(0)
                 s3.upload_fileobj(pdf, BUCKET_NAME, unique_filename, ExtraArgs={'ContentType': 'application/pdf'})
                 
                 # Construct the file URL

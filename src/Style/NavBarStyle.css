@@ -1,33 +1,39 @@
-*{
+* {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
 .custom-navbar {
-    width: 100%;
-    min-height: 7vh;
+    position: fixed;
+    top: 0; /* Fixes it to the top */
+    left: 50%; /* Centers the navbar horizontally */
+    transform: translateX(-50%); /* Adjusts positioning to truly center */
+    width: 80%; /* Set the width you desire (e.g., 80%) */
+    max-width: 1200px; /* Optional: sets a maximum width */
+    min-height: 7vh; /* Maintain minimum height */
     display: flex;
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    /* color: #fff; */
-    background: black;
+    background: rgba(0, 0, 0, 0.5); /* Translucent black background for base */
+    backdrop-filter: blur(10px); /* Apply blur effect */
+    border-radius: 15px; /* Rounded corners */
+    z-index: 1000; /* Ensure it's above other content */
+    padding: 10px 20px; /* Adds padding for a nicer look */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3); /* Optional: adds a shadow */
+    margin-top: 7px;
 }
 
 .custom-nav-left {
     margin-left: 30px;
-    width: 10%;
     text-align: right;
 }
 
-.nav-logo{
-    width: 150px;
-    /* Reduced width */
-    /* height: auto; */
+.nav-logo {
+    width: 150px; /* Reduced width */
     padding-top: 1vh;
-    margin-top: -1vh;
-    /* Corrected typo, use "vh" for viewport height */
+    margin-top: -1vh; /* Adjust if needed */
 }
 
 .custom-nav-right {
@@ -41,20 +47,16 @@
     font-size: 20px;
     padding: 0;
     margin: 0;
-    /* color: rgb(222, 233, 241); */
-    color: linear-gradient(to right, #567350, #e6f4e4);
+    color: #23dc8c; /* Change to a solid color for visibility */
 }
 
 .custom-nav-links li:hover {
     transform: scale(1.1);
     transition: transform 0.3s ease;
-    /* text-decoration: underline; */
 }
 
-
 .custom-nav-links a {
-    color: #23dc8c;
+    color: #23dc8c; /* Adjust as needed */
     text-decoration: none;
     font-weight: 500;
-    font-size: 800;
 }

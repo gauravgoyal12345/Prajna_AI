@@ -33,7 +33,8 @@ function UserProfile() {
                             title: item.chat_title,
                             summary: item.summary,
                             timestamp: item.timestamp,
-                            pdfs: item.pdf_links // Make sure this is the correct property
+                            pdfs: item.pdf_links,
+                            names: item.pdf_names
                         }));
 
                         setChats(chatsData);
@@ -87,7 +88,7 @@ function UserProfile() {
                     pdfLinks.map((pdf, index) => (
                         <a 
                             key={index} 
-                            href={pdf} 
+                            href={pdf['file_url']} 
                             target="_blank" 
                             rel="noopener noreferrer" 
                             style={{ margin: '0 10px', textDecoration: 'none', color: '#1976d2' }}

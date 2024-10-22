@@ -5,10 +5,8 @@ body {
   margin: 0;
   padding: 0;
   background-color: black;
-  color: white;
-  /* Ensures all text is white */
-  overflow-x: hidden;
-  /* Prevent horizontal scroll */
+  color: white; /* Ensures all text is white */
+  overflow-x: hidden; /* Prevent horizontal scroll */
 }
 
 /* Main container that holds the landing page content */
@@ -17,10 +15,9 @@ body {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: calc(100vh - 7vh);
+  height: calc(100vh - 45vh);
   background-color: black;
   text-align: center;
-  margin-top: 10px;
 }
 
 .gradient-heading {
@@ -30,78 +27,9 @@ body {
   -webkit-text-fill-color: transparent;
   background-clip: text;
   color: transparent;
-  margin: 0;
-  font-family: 'Courier New', Courier, monospace;
-  text-align: center;
-  /* Center align the text */
-  margin: 4rem 0;
+  margin: 2rem 0;
+  padding-left: 10px;
 }
-
-/* Main container for centering the box on the page */
-.info-box-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  /* Full viewport height */
-  /* background-color: #e6f4e4; Parent background color */
-}
-
-/* Box with dotted border and centered content */
-.info-box {
-  background-color: black;
-  /* padding: 40px; */
-  border: 2px dotted #567350;
-  /* Dotted border with green color */
-  border-radius: 10px;
-  max-width: 600px;
-  text-align: center;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  position: relative;
-}
-
-/* Heading styling with gradient text */
-.info-box-heading {
-  font-size: 2.5rem;
-  background: linear-gradient(to right, #a0b89c, #f0ffe4);
-  /* Whitish-green gradient */
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  color: transparent;
-  margin-bottom: 20px;
-  font-weight: bold;
-}
-
-/* Paragraph styling */
-.info-box-text {
-  margin: 20px 0;
-  font-size: 1.2rem;
-  color: #2c9a4d;
-  /* Darker green for readability */
-  line-height: 1.6;
-}
-
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .info-box {
-    padding: 20px;
-  }
-
-  .info-heading {
-    font-size: 2rem;
-  }
-
-  .info-text {
-    font-size: 1rem;
-  }
-
-  .info-button {
-    font-size: 0.9rem;
-  }
-}
-
 
 /* Styling for the typing effect text */
 .typing-effect span {
@@ -110,86 +38,102 @@ body {
   -webkit-text-fill-color: transparent;
   background-clip: text;
   text-fill-color: transparent;
-  font-size: 200px;
-  /* Font size for the first heading */
+  font-size: 200px; /* Font size for the first heading */
   font-family: 'Courier New', Courier, monospace;
-  text-align: center;
-  /* Center align the text */
+  text-align: center; /* Center align the text */
 }
 
+.team-container{
+  margin-left: 100px;
+}
 /* Card styling */
-.card {
-  background-color: #6b6b6b;
-  /* Dark background for cards */
-  border-radius: 8px;
-  /* Rounded corners */
-  padding: 20px;
-  /* Inner spacing */
-  margin: 10px;
-  /* Space around cards */
-  width: calc(33.33% - 20px);
-  /* Set width to one-third minus margin */
-  transition: transform 0.3s;
-  /* Animation on hover */
-  text-align: center;
-  /* Center text inside the card */
+.team-container .MuiCard-root {
+  background-color: #ffffff; /* Light background for cards */
+  border-radius: 8px; /* Rounded corners */
+  padding: 15px; /* Inner spacing */
+  margin: 10px; /* Space around cards */
+  transition: transform 0.3s, box-shadow 0.3s; /* Animation on hover */
+  text-align: center; /* Center text inside the card */
+  width: 300px; /* Decrease width of the cards */
+  height: 380px; /* Decrease height of the cards */
 }
 
-.card img {
-  width: 100%;
-  /* Full width */
-  height: auto;
-  /* Maintain aspect ratio */
-  border-radius: 8px;
-  /* Rounded corners for images */
-  margin-bottom: 10px;
-  /* Space between image and text */
+/* Hover effect for card enlargement */
+.team-container .MuiCard-root:hover {
+  transform: scale(1.05); /* Slightly enlarge on hover */
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3); /* Add shadow on hover for depth */
 }
 
-.card:hover {
-  transform: scale(1.05);
-  /* Slightly enlarge on hover */
+.team-container .MuiCard-root img {
+  width: 100%; /* Full width */
+  height: auto; /* Maintain aspect ratio */
+  border-radius: 8px; /* Rounded corners for images */
+  margin-bottom: 10px; /* Space between image and text */
+}
+
+/* Responsive adjustments for the cards */
+@media (max-width: 768px) {
+  .team-container .MuiCard-root {
+    width: 90%; /* Make cards wider on smaller screens */
+    margin: 10px; /* Maintain margin for spacing */
+  }
+}
+
+@media (max-width: 480px) {
+  .team-container .MuiCard-root {
+    width: 95%; /* Further adjust card width for mobile */
+    margin: 5px; /* Reduce margin for mobile screens */
+  }
 }
 
 /* Icons for LinkedIn and GitHub */
 .social-icons {
   display: flex;
-  justify-content: center;
-  /* Center icons */
-  margin-top: 10px;
-  /* Space above icons */
+  justify-content: center; /* Center icons */
+  margin-top: 10px; /* Space above icons */
 }
 
-.social-icons a {
-  margin: 0 10px;
-  /* Space between icons */
-  color: white;
-  /* Icon color */
-  font-size: 24px;
-  /* Size of the icons */
+.features-container {
+  border-radius: 8px; /* Rounded corners */
+  margin: auto; /* Center the container with margin */
+  margin-bottom: 30px; /* Add margin bottom for spacing below the container */
+  max-width: 1200px; /* Maximum width for larger screens */
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); /* Soft shadow effect */
+}
+
+/* Adjust feature title */
+.feature-title {
+  font-size: 1.5rem; /* Title font size */
+  font-weight: bold; /* Bold text */
+  margin-bottom: 10px; /* Space below the title */
+  color: #e6f4e4; /* Light green color for title */
+  height: 50px; /* Set a fixed height to align all titles */
+  margin-bottom: 10px;
+}
+
+/* Description remains the same */
+.feature-description {
+  padding-top: 20px;
+  font-size: 1rem; /* Description font size */
+  color: #ffffff; /* White text color for readability */
+  line-height: 1.5; /* Line height for better spacing */
 }
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .typing-effect span {
-    font-size: 150px;
-    /* Adjust font size for smaller screens */
+    font-size: 150px; /* Adjust font size for smaller screens */
   }
 
-  .card {
-    width: calc(45% - 20px);
-    /* Two cards fit in a row */
-  }
-}
-
-@media (max-width: 480px) {
-  .typing-effect span {
-    font-size: 100px;
-    /* Smaller font size for mobile */
+  .features-container {
+    padding: 20px; /* Less padding on smaller screens */
   }
 
-  .card {
-    width: calc(90% - 20px);
-    /* Full width on mobile */
+  .feature-title {
+    font-size: 1.3rem; /* Smaller title font size */
+  }
+
+  .feature-description {
+    font-size: 0.9rem; /* Smaller description font size */
   }
 }
