@@ -257,46 +257,76 @@ def loginUser():
 
     return jsonify({"msg": "Invalid email or password"}), 401
 
-@app.route("/chat_summary", methods=['POST'])
+@app.route("/logout", methods=['POST'])
 def save_chat_summary():
     data = request.json
 
     # Check if the required fields are present
-    if not data.get('email') or not data.get('summary'):
-        return jsonify({"msg": "'email' and 'summary' are required"}), 400
+    if not data.get('email') or not data.get('chat_history'):
+        return jsonify({"msg": "'email' and 'chat_history' are required"}), 400
 
-    summary = generate_summary(data["summary"])
-    # Store the chat summary in the database
-    chat_summary = {
+    summary = generate_summary(data["chat_history"])
+    chat_title = generate_chat_title(summary)
+    
+    chat_details = {
         'email': data['email'],
-        'summary': data['summary'],
-        'timestamp': datetime.utcnow(), # Optionally add a timestamp
-        'pdf': data['pdf'],
+        'chat_history' : data['chat_history'],
+        'summary': summary,
+        'chat_title' : chat_title,
+        'timestamp': datetime.utcnow(), 
     }
 
-    chat_summaries_collection.insert_one(chat_summary)
+    chat_summaries_collection.insert_one(chat_details)
     
     return jsonify({"msg": "Chat summary saved successfully"}), 201
 
-app.route("/chat_summary/<email>", methods=['GET'])
-def get_chat_summaries(email):
+app.route("/dashboard", methods=['GET'])
+def get_prev_chat_details(email):
     # Find chat summaries for the specified email, sorted by timestamp (most recent first)
-    summaries = chat_summaries_collection.find({'email': email}).sort('timestamp', -1)
+    chat_details = chat_summaries_collection.find({'email': email}).sort('timestamp', -1)
 
     # Convert the cursor to a list of summaries
-    summaries_list = []
-    for summary in summaries:
-        summaries_list.append({
-            'summary': summary['summary'],
-            'timestamp': summary['timestamp'],
-            'pdfs': summary['pdf']
+    chat_details_list = []
+    for details in chat_details:
+        if(len(chat_details_list) == 3):
+            break
+        chat_details_list.append({
+            'summary': details['summary'],
+            'chat_title' : details['chat_title'],
+            'timestamp': details['timestamp'],
+            'pdfs': details['pdfs']
         })
 
     # Check if any summaries were found
-    if not summaries_list:
-        return jsonify({"msg": "No summaries found for this user"}), 404
+    if not chat_details_list:
+        return jsonify({"msg": "No chat details found for this user"}), 404
 
-    return jsonify(summaries_list), 200
+    return jsonify(chat_details_list), 200
+
+
+app.route("/user_chat", methods=['GET'])
+def get_prev_chat_details():
+    
+    data = request.json
+    # Check if the required fields are present
+    if not data.get('email') or not data.get('chat_title'):
+        return jsonify({"msg": "'email' and 'chat_title' are required"}), 400
+    
+    # Find chat summaries for the specified email, sorted by timestamp (most recent first)
+    chat_details = chat_summaries_collection.find({'email': email, 'chat_title': }).sort('timestamp', -1)
+
+    # Convert the cursor to a list of summaries
+    chat_details_list = []
+    chat_details_list.append({
+        'chat_history': details['chat_history'],
+        'timestamp': details['timestamp'],
+    })
+
+    # Check if any summaries were found
+    if not chat_details_list:
+        return jsonify({"msg": "No previous chat details found for this user"}), 404
+
+    return jsonify(chat_details_list), 200
 
 @app.route("/handle_query", methods=['POST'])
 def handle_user_query():
