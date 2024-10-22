@@ -54,6 +54,7 @@ export default function LogInForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log(loginData)
     if (loginData.email.trim() === '' || loginData.password.trim() === '') {
       // setEmptyFieldAlert(true);
       // setAlertMessage("Please Fill all the details");
@@ -96,7 +97,7 @@ export default function LogInForm() {
       setSubmitted(true);
       setLoadingState(true);
       const response = await axios.post("http://localhost:5000/login", loginData);
-
+      console.log(response);
       if (response.status === 200) {
         let userData = response.data.user;
 

@@ -5,8 +5,8 @@ import pkg_resources
 
 installed_packages = pkg_resources.working_set
 print("Installed packages:")
-for package in installed_packages:
-    print(package)
+# for package in installed_packages:
+#     print(package)
 
 
 from flask import Flask, request, jsonify
@@ -231,7 +231,7 @@ def upload_files():
         return jsonify({'error': 'No file selected for uploading'}), 400
     print(files)
     uploaded_files = []
-    
+    file_names = []
     text_chunks = []
     file_paths = []
     filetext = ""
@@ -247,6 +247,7 @@ def upload_files():
 
         pdf_reader = PdfReader(pdf_content)
         filename = os.path.join(app.config['UPLOAD_FOLDER'], pdf.filename)
+        file_names.append(pdf.filename)
         pdf.save(filename)
         if pdf and pdf.filename.endswith('.pdf'):
             unique_filename = f"{uuid.uuid4()}_{pdf.filename}"
@@ -330,7 +331,8 @@ def upload_files():
    
     chat_summary = {
             'session_id': session_id,
-            'pdf': uploaded_files
+            'pdf_links': uploaded_files,
+            'pdf_names': file_names,
     }
     chat_summaries_collection.insert_one(chat_summary)
 
@@ -469,11 +471,24 @@ def save_chat_summary():
         return jsonify({'error': str(e)}), 500
 
 
-app.route("/dashboard", methods=['GET'])
-def get_prev_chat_details(email):
-    # Find chat summaries for the specified email, sorted by timestamp (most recent first)
-    chat_details = chat_summaries_collection.find({'email': email}).sort('timestamp', -1)
+@app.route("/dashboard", methods=['POST', 'OPTIONS'])
+def get_prev_chat_details():
+    if request.method == 'OPTIONS':  # Handle preflight request
+        return jsonify({"msg": "CORS preflight request handled"}), 200
+    print('jbsnwv')
+    data = request.get_json()  # Get JSON data from the request body
+    email = data.get('email')  # Extract email from the data
+    print('Received email:', email)  # Log the email
+    # Check if the user exists in the database
+    user_exists = users_collection.find_one({'email': email})
 
+    if not user_exists:
+        return jsonify({"msg": "User not found"}), 404
+    # Find chat summaries for the specified email, sorted by timestamp (most recent first)
+    print('hello')
+    chat_details = chat_summaries_collection.find({'email': email}).sort('timestamp', -1)
+    print('hello 2')
+    print(chat_details)
     # Convert the cursor to a list of summaries
     chat_details_list = []
     for details in chat_details:
@@ -483,7 +498,9 @@ def get_prev_chat_details(email):
             'summary': details['summary'],
             'chat_title' : details['chat_title'],
             'timestamp': details['timestamp'],
-            'pdfs': details['pdfs']
+            'pdf_links': details['pdf_links'],
+            'pdf_names': details['pdf_names'],
+            'session_id': details['session_id'],
         })
 
     # Check if any summaries were found

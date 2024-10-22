@@ -5,6 +5,7 @@ import FinalComponents from './Components/FinalComponent';
 import SignUpForm from './Components/SignUp2';
 import LogInForm from './Components/Login2';
 import PDFopener from './Components/PDFOpener';
+import UserProfile from './Components/UserProfile';
 function App() {
   return (
     <BrowserRouter>
@@ -15,6 +16,7 @@ function App() {
           <Route path='/signUp' element = {<SignUpForm/>}/>
           <Route path='/upload' element = {<FinalComponents/>}/>
           <Route path='/pdf' element = {<PDFopener/>}/>
+          <Route path='/profile' element = {<UserProfile/>}/>
         </Routes>
       </BrowserRouter>
   );
