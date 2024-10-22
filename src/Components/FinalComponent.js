@@ -7,6 +7,8 @@ import { Alert } from "antd";
 import { TypeAnimation } from 'react-type-animation';
 import MicIcon from '@mui/icons-material/Mic';
 import StopIcon from '@mui/icons-material/Stop';
+import { IconButton, Avatar, Menu, MenuItem } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 
 function FinalComponents() {
 
@@ -22,6 +24,17 @@ function FinalComponents() {
   const [responseQuestions, setResponseQuestions] = useState([]); // New state for response questions
   const [sessionID, setSessionID] = useState('');
   const [isListening, setIsListening] = useState(false);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const open = Boolean(anchorEl);
+  const navigate = useNavigate();
+
+  const handleMenuClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem('userDetails'));
@@ -180,8 +193,19 @@ function FinalComponents() {
   };
 
   return (
-    <div className="main-container">
-      <div className="left-container">
+    <div className="main-container" style={{
+      margin: 0,
+      padding: 0,
+      backgroundColor: 'white',  // White background to ensure no black strip
+      minHeight: '100vh',        // Full viewport height
+      display: 'flex',           // Use flexbox to align left and right containers
+      flexDirection: 'row',      // Align children in a row (left-right layout)
+      width: '100vw',            // Full viewport width
+    }}>
+      <div className="left-container" style={{
+        flex: 0.5,                   // Take up available space
+                   // Add padding as necessary
+      }}>
         <div className="upload-container">
           <label htmlFor="file-upload" className="custom-file-upload">
             <i className="upload-icon">&#8682;</i>  {/* Simple upload icon */}
@@ -208,7 +232,47 @@ function FinalComponents() {
           </div>
         </div>
       </div>
-      <div className="right-container">
+      <div
+        className="right-container"
+        style={{
+          flex: 2,                   // Right container takes up more space
+          margin: 0,
+          padding: 0,
+          backgroundColor: 'transparent', // Remove any background color
+          display: 'flex',
+          flexDirection: 'column',
+          height: '100vh',            // Full height of the viewport
+          overflow: 'hidden',         // Ensure content doesn't overflow
+        }}
+      >
+        <div className="profile-menu-container" style={{ textAlign: 'right', margin: 0 }}>
+          <IconButton onClick={handleMenuClick} style={{ float: 'right', background: 'transparent' }}>
+            <Avatar alt="Profile" />
+          </IconButton>
+          <Menu
+            anchorEl={anchorEl}
+            open={Boolean(anchorEl)}
+            onClose={handleMenuClose}
+            anchorOrigin={{
+              vertical: 'top',
+              horizontal: 'right',
+            }}
+            transformOrigin={{
+              vertical: 'top',
+              horizontal: 'right',
+            }}
+            slotProps={{
+              style: {
+                backgroundColor: 'white', // Ensure no black background
+              }
+            }}
+          >
+            <MenuItem onClick={() => { handleMenuClose(); navigate("/profile"); }}>Profile</MenuItem>
+            <MenuItem onClick={() => { handleMenuClose(); navigate("/"); }}>Home</MenuItem>
+            <MenuItem onClick={() => { handleMenuClose(); navigate("/logout"); }}>Logout</MenuItem>
+          </Menu>
+        </div>
+
         <div className='external-chatbot-container'>
           <div className="chatbot-container">
 
@@ -288,7 +352,7 @@ function FinalComponents() {
           </div>
         </div>
       </div>
-    </div>
+    </div >
   );
 }
 
