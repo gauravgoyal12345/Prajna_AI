@@ -165,16 +165,32 @@ client = QdrantClient(
     api_key=api_key,
 )
 
+store = {}
 
-# print(client.get_collections())
-def get_ans(question,collection_name):
+def get_session_history(session_id: str) -> BaseChatMessageHistory:
+        if session_id not in store:
+            store[session_id] = ChatMessageHistory()
+        return store[session_id]
     
+def get_VectorStore(collection_name):
     vectorstore = QdrantVectorStore(
     client=client,
     collection_name=collection_name,
     embedding=embeddings,
-)
+    )
+    return vectorstore
+     
+
+# print(client.get_collections())
+def get_ans(question,collection_name):
     
+#     vectorstore = QdrantVectorStore(
+#     client=client,
+#     collection_name=collection_name,
+#     embedding=embeddings,
+# )
+    vectorstore = get_VectorStore(collection_name)
+
 
 
 
@@ -182,9 +198,10 @@ def get_ans(question,collection_name):
     docs = retriever.invoke(question)
     # Assuming 'retrieved_documents' is the list of retrieved documents
     citations = [
-        {"paragraph_num": doc.metadata.get("paragraph_num"), "page_num": doc.metadata.get("page_num"),"source_pdf":doc.metadata.get("source_pdf")}
+        {"page_num": doc.metadata.get("page_num"),"source_pdf":doc.metadata.get("source_pdf"),"page_content":doc.page_content}
         for doc in docs
-]
+]   
+    
 
 # Display the collected information
     
@@ -252,14 +269,18 @@ def get_ans(question,collection_name):
     question_answer_chain = create_stuff_documents_chain(llm, qa_prompt)
     
     rag_chain = create_retrieval_chain(history_aware_retriever, question_answer_chain)
-    store = {}
-    def get_session_history(session_id: str) -> BaseChatMessageHistory:
-        if session_id not in store:
-            store[session_id] = ChatMessageHistory()
-        return store[session_id]
+    # store = {}
+    # def get_session_history(session_id: str) -> BaseChatMessageHistory:
+    #     if session_id not in store:
+    #         store[session_id] = ChatMessageHistory()
+    #     return store[session_id]
     
-    
-
+    store[collection_name] = ChatMessageHistory()
+    store[collection_name].add_user_message('what doc about')
+    store[collection_name].add_ai_message('This document describes a project...')
+    store[collection_name].add_user_message('what diseases')
+    store[collection_name].add_ai_message('The document mentions several lung diseases...')
+    # get_session_history = store[collection_name]
     conversational_rag_chain = RunnableWithMessageHistory(
         rag_chain,
         get_session_history,
@@ -268,26 +289,25 @@ def get_ans(question,collection_name):
         output_messages_key="answer",
     )
 
-    
     # invoke_chain = conversational_rag_chain(question,session_id)
     result = conversational_rag_chain.invoke(
     {"input": question},
-    config={"configurable": {"session_id": "abc123"}}
+    config={"configurable": {"session_id": collection_name}}
     )
+    # return type(store[collection_name])
+
     # return store[session_id]
-    return result['answer'],citations
+    return citations
 
 
-# while True :
-#     question = input ("enter question ")
-#     if question == "end":
-#         break
+while True :
+    question = input ("enter question ")
+    if question == "end":
+        break
 
-#     print(" ")
-#     print(get_ans(question,"demo7"))
-#     print(" ")
-# client.get_collection("demo")
-# print(get_pdf_text(pdfs))
-
+    print(" ")
+    print(get_ans(question,"demo7"))
+    print(" ")
+# EncodingWarning
 
 # get_ans("what is the name","demo4")

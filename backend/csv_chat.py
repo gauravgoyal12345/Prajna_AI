@@ -10,9 +10,11 @@ load_dotenv()
 api_key = os.getenv('PANDASAI_API_KEY')
 
 llm = BambooLLM(api_key=api_key)
-df = SmartDataframe("result.csv", config={"llm": llm})
 
-response = df.chat("what are the fields in the csv ?")
-print(response)
+def Csv_response(csv_path):
+    df = SmartDataframe(csv_path, config={"llm": llm})
+
+    response = df.chat("what are the fields in the csv ?")
+    return response
 
 

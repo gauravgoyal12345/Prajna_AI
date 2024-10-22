@@ -59,9 +59,21 @@ from PyPDF2 import PdfReader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.docstore.document import Document
 
+aws_access_key_id=os.getenv('AWS_ACCESS_KEY')
+aws_secret_access_key=os.getenv('AWS_SECRET_KEY')
+region_name=os.getenv('REGION_NAME')
+# BUCKET_NAME = os.getenv('BUCKET_NAME')
 
 from io import BytesIO
 from PyPDF2 import PdfReader
+import boto3
+from botocore.exceptions import NoCredentialsError
+import uuid
+s3 = boto3.client('s3', aws_access_key_id=aws_access_key_id,
+                         aws_secret_access_key=aws_secret_access_key,
+                         region_name=region_name)
+
+BUCKET_NAME = os.getenv('BUCKET_NAME')
 
 
 
@@ -73,27 +85,187 @@ if not os.path.exists(UPLOAD_FOLDER):
 # Get port from environment variables or default to 5000
 PORT = os.environ.get('PORT', 5000)
 
-@app.route('/upload', methods=['POST'])
+# @app.route('/upload', methods=['POST'])
+# def upload_files():
+#     # Get the list of files from the request with key 'pdfs'
+#     # print(request.files)
+#     files = request.files.getlist('pdfs')
+#     print("total files ::::>>>>>", files)
+#     # print(files)
+#     if not files:
+#         return jsonify({'error': 'No files uploaded'}), 400
+    
+#     text_chunks = []
+#     file_paths = []
+#     filetext = ""
+#     i = 1
+#     for pdf in files:
+#         print("this is the pdf name :::>>>>>",pdf.name)
+#         pdf_content = BytesIO(pdf.read())
+    
+#         pdf_reader = PdfReader(pdf_content)
+#         filename = os.path.join(app.config['UPLOAD_FOLDER'], pdf.filename)
+#         pdf.save(filename)
+#         text = ""
+#         for page_num in range(len(pdf_reader.pages)):
+#                 text += pdf_reader.pages[page_num].extract_text()
+#         filetext += f"\n\n pdf number {i} \n\n"
+#         filetext += text
+#         i += 1
+#         # print("this is pdf reader ::::>>>>",pdf_reader)
+#         for page_num, page in enumerate(pdf_reader.pages):
+#             text = page.extract_text()
+#             if text:
+#                 paragraphs = text.split("\n\n")  # Split text into paragraphs
+#                 for para_num, paragraph in enumerate(paragraphs):
+#                     text_chunks.append({
+#                         "text": paragraph,
+#                         "page_num": page_num + 1,  # Page number (1-based index)
+#                         "paragraph_num": para_num + 1,  # Paragraph number (1-based index)
+#                         "source_pdf": pdf.filename
+#                     })
+#     # print("this is text chunks :::>>>>>>",text_chunks)
+#     # print("this is filetext::::>>>>>",filetext)
+#     session_id = request.form.get('session_id')
+#     if not session_id:
+#         return jsonify({'error': 'Session ID is required'}), 400
+#     # print(session_id)
+#     # print(files)
+
+#     # Process PDF files and extract text
+#     # pdfchunks = get_pdf_text(files)
+    
+#     text_splitter = RecursiveCharacterTextSplitter(chunk_size=512, chunk_overlap=100)
+#     split_chunks = []
+#     for chunk in text_chunks:
+#         splits = text_splitter.split_text(chunk["text"])
+#         for split in splits:
+#             split_chunks.append({
+#                 "text": split,
+#                 "page_num": chunk["page_num"],
+#                 "paragraph_num": chunk["paragraph_num"],  # Maintain paragraph number
+#                 "source_pdf": chunk["source_pdf"]
+#             })
+    
+#     # print("this is splitchunks:::>>>>",split_chunks)
+#     documents_with_metadata = [
+#         Document(page_content=split['text'], metadata={
+#             'page_num': split['page_num'],
+#             'paragraph_num': split['paragraph_num'],
+#             'source_pdf': split['source_pdf']
+#         })
+#         for split in split_chunks
+#     ]
+#     # print("this is metadata:::::>>>>>",documents_with_metadata)
+
+#     # Store documents in vector store using session_id as collection name
+#     vectorstore = QdrantVectorStore.from_documents(
+#         documents_with_metadata,
+#         embeddings,
+#         url=url,
+#         prefer_grpc=True,
+#         api_key=api_key,
+#         collection_name=session_id,
+#     )
+#     # print("vector db made")
+
+    
+#     # for pdf in files:
+#     #     pdf_content = BytesIO(pdf.read())
+#     #     print("this is pdf content ", pdf_content)
+#     #     pdf_reader1 = PdfReader(pdf_content)
+
+#         # print(pdf_content)  # Check if pdf_content has data
+#         # print(1)
+#         # print ("this is pdf_reader :::>>>>>",pdf_reader1)
+#         # # if not pdf_content.getvalue():
+#         # #     print(7)  # Check if BytesIO has any data
+#         # #     continue  # Skip empty files
+
+        
+#         # pdf_reader = PdfReader(pdf_content)
+        
+#         # text = ""
+#         # for page_num in range(len(pdf_reader.pages)):
+#         #         text += pdf_reader.pages[page_num].extract_text()
+#         # filetext += f"\n\n pdf number {i} \n\n"
+#         # filetext += text
+#         # i += 1
+
+#     # for file in files:
+#         # if file and file.filename.endswith('.pdf'):  # Check if it's a valid PDF file
+#         #     # Save the file to the UPLOAD_FOLDER
+#         #     filename = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
+#         #     file_content = BytesIO(file.read())
+#         #     file.save(filename)
+#         #     file_paths.append(filename)
+
+#         #     # Extract text from PDF
+#         #     pdf_reader = PdfReader(file_content)
+#         #     text = ""
+#         #     for page_num in range(len(pdf_reader.pages)):
+#         #         text += pdf_reader.pages[page_num].extract_text()
+#         #     filetext += f"\n\n pdf number {i} \n\n"
+#         #     filetext += text
+#         #     i += 1
+#         # else:
+#         #     return jsonify({'error': 'Invalid file type. Only PDF files are allowed.'}), 400
+
+#     # print("this is filetext::::>>>>>>",filetext)
+    
+#     # # Generate recommended questions based on the extracted PDF text
+#     result = question_recc(filetext)
+
+#     return jsonify({'message': result}), 200
+
 def upload_files():
-    # Get the list of files from the request with key 'pdfs'
-    # print(request.files)
-    files = request.files.getlist('pdfs')
-    print("total files ::::>>>>>", files)
-    # print(files)
-    if not files:
-        return jsonify({'error': 'No files uploaded'}), 400
+    session_id = request.form.get('session_id')
+    print("hello")
+    if 'pdfs' not in request.files:
+        return jsonify({'error': 'No file part in the request'}), 400
+
+    files = request.files.getlist('pdfs')  # Get all files with the key 'pdfs'
+
+    if len(files) == 0:
+        return jsonify({'error': 'No file selected for uploading'}), 400
+    print(files)
+    uploaded_files = []
     
     text_chunks = []
     file_paths = []
     filetext = ""
     i = 1
     for pdf in files:
-        print("this is the pdf name :::>>>>>",pdf.name)
+        print("hello2")
+        #storage and link generation of pdf 
+        if pdf.filename == '':
+            return jsonify({'error': 'One or more files have no name'}), 400
+
+        print("this is the pdf name :::>>>>>",pdf.filename)
         pdf_content = BytesIO(pdf.read())
-    
+
         pdf_reader = PdfReader(pdf_content)
         filename = os.path.join(app.config['UPLOAD_FOLDER'], pdf.filename)
         pdf.save(filename)
+        if pdf and pdf.filename.endswith('.pdf'):
+            unique_filename = f"{uuid.uuid4()}_{pdf.filename}"
+
+            try:
+                # Upload file to S3
+                s3.upload_fileobj(pdf, BUCKET_NAME, unique_filename, ExtraArgs={'ContentType': 'application/pdf'})
+                
+                # Construct the file URL
+                file_url = f"https://{BUCKET_NAME}.s3.{s3.meta.region_name}.amazonaws.com/{unique_filename}"
+                
+                # Add uploaded file URL to the list
+                uploaded_files.append({'file_url': file_url})
+
+            except NoCredentialsError:
+                return jsonify({'error': 'Credentials not available'}), 400
+            except Exception as e:
+                return jsonify({'error': str(e)}), 500
+        
+        print(uploaded_files)
         text = ""
         for page_num in range(len(pdf_reader.pages)):
                 text += pdf_reader.pages[page_num].extract_text()
@@ -114,7 +286,7 @@ def upload_files():
                     })
     # print("this is text chunks :::>>>>>>",text_chunks)
     # print("this is filetext::::>>>>>",filetext)
-    session_id = request.form.get('session_id')
+    
     if not session_id:
         return jsonify({'error': 'Session ID is required'}), 400
     # print(session_id)
@@ -144,7 +316,6 @@ def upload_files():
         })
         for split in split_chunks
     ]
-    # print("this is metadata:::::>>>>>",documents_with_metadata)
 
     # Store documents in vector store using session_id as collection name
     vectorstore = QdrantVectorStore.from_documents(
@@ -155,57 +326,17 @@ def upload_files():
         api_key=api_key,
         collection_name=session_id,
     )
-    # print("vector db made")
+   
+    chat_summary = {
+            'session_id': session_id,
+            'pdf': uploaded_files
+    }
+    chat_summaries_collection.insert_one(chat_summary)
 
-    
-    # for pdf in files:
-    #     pdf_content = BytesIO(pdf.read())
-    #     print("this is pdf content ", pdf_content)
-    #     pdf_reader1 = PdfReader(pdf_content)
-
-        # print(pdf_content)  # Check if pdf_content has data
-        # print(1)
-        # print ("this is pdf_reader :::>>>>>",pdf_reader1)
-        # # if not pdf_content.getvalue():
-        # #     print(7)  # Check if BytesIO has any data
-        # #     continue  # Skip empty files
-
-        
-        # pdf_reader = PdfReader(pdf_content)
-        
-        # text = ""
-        # for page_num in range(len(pdf_reader.pages)):
-        #         text += pdf_reader.pages[page_num].extract_text()
-        # filetext += f"\n\n pdf number {i} \n\n"
-        # filetext += text
-        # i += 1
-
-    # for file in files:
-        # if file and file.filename.endswith('.pdf'):  # Check if it's a valid PDF file
-        #     # Save the file to the UPLOAD_FOLDER
-        #     filename = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
-        #     file_content = BytesIO(file.read())
-        #     file.save(filename)
-        #     file_paths.append(filename)
-
-        #     # Extract text from PDF
-        #     pdf_reader = PdfReader(file_content)
-        #     text = ""
-        #     for page_num in range(len(pdf_reader.pages)):
-        #         text += pdf_reader.pages[page_num].extract_text()
-        #     filetext += f"\n\n pdf number {i} \n\n"
-        #     filetext += text
-        #     i += 1
-        # else:
-        #     return jsonify({'error': 'Invalid file type. Only PDF files are allowed.'}), 400
-
-    # print("this is filetext::::>>>>>>",filetext)
-    
     # # Generate recommended questions based on the extracted PDF text
     result = question_recc(filetext)
 
     return jsonify({'message': result}), 200
-
 @app.route("/register", methods=['POST'])
 def createUser():
     data = request.json
@@ -257,6 +388,29 @@ def loginUser():
 
     return jsonify({"msg": "Invalid email or password"}), 401
 
+# @app.route("/logout", methods=['POST'])
+# def save_chat_summary():
+#     data = request.json
+
+#     # Check if the required fields are present
+#     if not data.get('email') or not data.get('chat_history'):
+#         return jsonify({"msg": "'email' and 'chat_history' are required"}), 400
+
+#     summary = generate_summary(data["chat_history"])
+#     chat_title = generate_chat_title(summary)
+    
+#     chat_details = {
+#         'email': data['email'],
+#         'chat_history' : data['chat_history'],
+#         'summary': summary,
+#         'chat_title' : chat_title,
+#         'timestamp': datetime.utcnow(), 
+#     }
+
+#     chat_summaries_collection.insert_one(chat_details)
+    
+#     return jsonify({"msg": "Chat summary saved successfully"}), 201
+
 @app.route("/logout", methods=['POST'])
 def save_chat_summary():
     data = request.json
@@ -279,7 +433,6 @@ def save_chat_summary():
     chat_summaries_collection.insert_one(chat_details)
     
     return jsonify({"msg": "Chat summary saved successfully"}), 201
-
 app.route("/dashboard", methods=['GET'])
 def get_prev_chat_details(email):
     # Find chat summaries for the specified email, sorted by timestamp (most recent first)
