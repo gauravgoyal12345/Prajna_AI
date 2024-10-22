@@ -95,25 +95,25 @@ const LandingPage = () => {
             {
               title: 'Upload your sources',
               description:
-                'Upload PDFs, websites, YouTube videos, audio files, Google Docs, or Google Slides, and NotebookLM will summarize them and make interesting connections between topics, all powered by Gemini 1.5’s multimodal understanding capabilities.',
+                'Upload PDFs, and PDFGenie will summarize them and create insightful connections between topics, powered by Gemini 1.5-flash multimodal understanding capabilities.',
               icon: <UploadFileIcon style={{ fontSize: '2.5rem', color: 'inherit' }} />,
             },
             {
               title: 'Instant insights',
               description:
-                'With all of your sources in place, NotebookLM gets to work and becomes a personalized AI expert in the information that matters most to you.',
+                'With all of your sources in place, PDFGenie gets to work efficiently and becomes a personalized AI expert in the information that matters most to you and your needs.',
               icon: <BoltIcon style={{ fontSize: '2.5rem', color: 'inherit' }} />,
             },
             {
-              title: 'See the source, not just the answer',
+              title: 'View the source alongside the answer',
               description:
-                'Gain confidence in every response because NotebookLM provides clear citations for its work, showing you the exact quotes from your sources.',
+                'Gain confidence in every response because PDFGenie provides clear citations for its work, showing you the exact quotes from your sources.',
               icon: <VisibilityIcon style={{ fontSize: '2.5rem', color: 'inherit' }} />,
             },
             {
-              title: 'Listen and learn on the go',
+              title: 'Continue where you left',
               description:
-                'Our new Audio Overview feature can turn your sources into engaging “Deep Dive” discussions with one click.',
+                'Resume your work seamlessly from the last point you stopped, ensuring no loss of progress, and easily pick up right where you left off.',
               icon: <HeadsetIcon style={{ fontSize: '2.5rem', color: 'inherit' }} />,
             },
           ].map((feature, index) => (
