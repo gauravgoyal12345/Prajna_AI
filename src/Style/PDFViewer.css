@@ -1,0 +1,51 @@
+/* PdfViewer.css */
+
+/* Style for the PDF container */
+.pdf-container-wrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 50%;
+    height: 100%;
+    border-right: 1px solid #ccc;
+    overflow-y: scroll;
+  }
+  
+  /* Close button style */
+  .pdf-close-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 10;
+    background-color: #ff5f5f;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .pdf-close-btn:hover {
+    background-color: #ff2b2b;
+  }
+  
+  /* Style for the rest of the app content */
+  .main-content {
+    margin-left: 20px;
+  }
+  
+  /* PDF button to toggle viewer */
+  .toggle-pdf-btn {
+    margin-right: 20px;
+    padding: 10px 15px;
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .toggle-pdf-btn:hover {
+    background-color: #45a049;
+  }
+  

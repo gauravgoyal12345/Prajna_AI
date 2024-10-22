@@ -275,11 +275,11 @@ def get_ans(question,collection_name):
     #         store[session_id] = ChatMessageHistory()
     #     return store[session_id]
     
-    store[collection_name] = ChatMessageHistory()
-    store[collection_name].add_user_message('what doc about')
-    store[collection_name].add_ai_message('This document describes a project...')
-    store[collection_name].add_user_message('what diseases')
-    store[collection_name].add_ai_message('The document mentions several lung diseases...')
+    # store[collection_name] = ChatMessageHistory()
+    # store[collection_name].add_user_message('what doc about')
+    # store[collection_name].add_ai_message('This document describes a project...')
+    # store[collection_name].add_user_message('what diseases')
+    # store[collection_name].add_ai_message('The document mentions several lung diseases...')
     # get_session_history = store[collection_name]
     conversational_rag_chain = RunnableWithMessageHistory(
         rag_chain,
@@ -297,17 +297,17 @@ def get_ans(question,collection_name):
     # return type(store[collection_name])
 
     # return store[session_id]
-    return citations
+    return result['answer'],citations
 
 
-while True :
-    question = input ("enter question ")
-    if question == "end":
-        break
+# while True :
+#     question = input ("enter question ")
+#     if question == "end":
+#         break
 
-    print(" ")
-    print(get_ans(question,"demo7"))
-    print(" ")
+#     print(" ")
+#     print(get_ans(question,"demo7"))
+#     print(" ")
 # EncodingWarning
 
 # get_ans("what is the name","demo4")

@@ -7,6 +7,7 @@ import LinkedInIcon from '@mui/icons-material/LinkedIn'; // LinkedIn icon
 import GitHubIcon from '@mui/icons-material/GitHub'; // GitHub icon
 import team from '../Assets/team.jpg'
 
+import RoundedButton from "./RoundedButton";
 const LandingPage = () => {
   const teamMembers = [
     { 
@@ -55,7 +56,7 @@ const LandingPage = () => {
     <div>
       <Navbar />
       <div className="landing-container">
-        {/* First H1 with type animation for the descriptive words */}
+        <h1 style={{marginBottom : 0}} class="gradient-heading">Welcome to PDF Genie</h1>
         <h1 className="typing-effect">
           <TypeAnimation
             sequence={[
@@ -72,6 +73,16 @@ const LandingPage = () => {
           />
         </h1>
       </div>
+        <h4 style={{ fontSize :'30px'}} class="gradient-heading">One Stop Destination for PDF Uploading</h4>
+        <div class="info-box-container">
+          <div class="info-box">
+            <h2 class="info-box-heading">How Our Application Works</h2>
+            <p class="info-box-text">
+              With PDF Genie, you can easily upload multiple PDF files at once, and it will quickly analyze them, providing helpful insights and questions, all in a simple and easy-to-use interface.
+            </p>
+            <div style={{marginBottom : '10px'}}><RoundedButton routeLink = "/upload" label = "Try PDF Genie"/>  </div>
+          </div>
+        </div>
 
       {/* Grid for team member cards */}
       <div className="team-container">

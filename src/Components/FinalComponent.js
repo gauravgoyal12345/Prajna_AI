@@ -18,6 +18,7 @@ function FinalComponents() {
   const [citation, setSitation] = useState([]);
   const [botResponse, setBotResponse] = useState('');
   const chatWindowRef = useRef(null);
+  const [userChatMessages, setUserChatMessages] = useState([]);
   const [emptyFieldAlert, setEmptyFieldAlert] = useState(false);
   const [userQuestions, setUserQuestions] = useState([]);
   const [userData, setUserData] = useState([]);
@@ -68,8 +69,8 @@ function FinalComponents() {
           const questions = response.data.message
             .split('\n')
             .filter(question => question.trim() !== '');
-
-          setUserQuestions(questions);
+            
+            setUserQuestions(questions);
         }
 
         console.log('Upload success:', response.data);
@@ -86,17 +87,65 @@ function FinalComponents() {
     }
   }, [userQuestions]);  // Dependency array to watch changes in userQuestions
 
+
   useEffect(() => {
-    const user = JSON.parse(localStorage.getItem('userDetails'));
-    if (user) {
-      setUserData(user)
+    if (messages !== null) { // Only store messages if they've been initialized
+      localStorage.setItem('chatMessages', JSON.stringify(messages));
+      chatWindowRef.current.scrollTop = chatWindowRef.current.scrollHeight;
     }
+  }, [messages]);
+
+  useEffect(() => {
+    const userChat = JSON.parse(localStorage.getItem('chatMessages'));
+    const user = JSON.parse(localStorage.getItem('userDetails'));
+
+    if (userChat && userChat.length > 0) {
+      setUserChatMessages(userChat);
+      setMessages(userChat);  // Load previous chat messages if available
+    } 
+    if (user) {
+      // If there are no chat messages, set the welcome message
+      setUserData(user);
+      setMessages([ 
+        { sender: "bot", text: `Hi ${user.name}! I am PDF-Genie, your personal guide to interact with things?` }
+      ]);
+    }
+
   }, []);  // Dependency array to watch changes in userQuestions
+
+  useEffect(() => {
+    if (messages !== null) { // Only store messages if they've been initialized
+      localStorage.setItem('chatMessages', JSON.stringify(messages));
+      chatWindowRef.current.scrollTop = chatWindowRef.current.scrollHeight;
+    }
+  }, [messages]);
 
   const handleTextInputChange = (e) => {
     setInput(e.target.value);
     setEmptyFieldAlert(false);
   };
+
+  const convertChatDataToPairs = (chatData) => {
+    const result = [];
+    let userMessage = "";
+    let botMessage = "";
+  
+    for (let i = 1; i < chatData.length; i++) {
+        const entry = chatData[i];
+        if (entry.sender === "user") {
+            userMessage = entry.text;
+        } 
+        else if (entry.sender === "bot") {
+            botMessage = entry.text;
+            if (userMessage) {
+                result.push(`${userMessage}: ${botMessage}`);
+                userMessage = ""; 
+            }
+        }
+    }
+    return result;
+  };
+
 
   const formatResponse = (response) => {
     return response
@@ -119,6 +168,7 @@ function FinalComponents() {
       setInput('');  // Clear input only for manual input case
 
       // Simulate a delay for bot response
+      const chatPairs = convertChatDataToPairs(newMessages); 
       const userRagChatData = { email: userData.email, question: message, session_id: userData.uid };
       const response = await axios.post("http://localhost:5000/handle_query", userRagChatData);
 
@@ -292,18 +342,7 @@ function FinalComponents() {
                         speed={0.1}    // Typing speed
                         repeat={0}   // Don't repeat
                       />
-                      {/* {msg.citations && msg.citations.length > 0 && (
-                        <div className="citations">
-                          <h4>Citations:</h4>
-                          <ul>
-                            {msg.citations.map((citation, index) => (
-                              <li key={index}>
-                                {`Page ${citation.page_num}, Paragraph ${citation.paragraph_num}, Source: ${citation.source_pdf}`}
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      )} */}
+
                       {msg.citations && msg.citations.length > 0 && (
                         <div className="citations">
                           <h4>Citations:</h4>

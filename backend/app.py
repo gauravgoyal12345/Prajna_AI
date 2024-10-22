@@ -218,6 +218,7 @@ PORT = os.environ.get('PORT', 5000)
 
 #     return jsonify({'message': result}), 200
 
+@app.route('/upload', methods=['POST'])
 def upload_files():
     session_id = request.form.get('session_id')
     print("hello")
@@ -411,17 +412,42 @@ def loginUser():
     
 #     return jsonify({"msg": "Chat summary saved successfully"}), 201
 
+# @app.route("/logout", methods=['POST'])
+# def save_chat_summary():
+#     data = request.json
+
+#     # Check if the required fields are present
+#     if not data.get('email') or not data.get('chat_history'):
+#         return jsonify({"msg": "'email' and 'chat_history' are required"}), 400
+
+#     summary = generate_summary(data["chat_history"])
+#     chat_title = generate_chat_title(summary)
+    
+#     chat_details = {
+#         'email': data['email'],
+#         'chat_history' : data['chat_history'],
+#         'summary': summary,
+#         'chat_title' : chat_title,
+#         'timestamp': datetime.utcnow(), 
+#     }
+
+#     chat_summaries_collection.insert_one(chat_details)
+    
+#     return jsonify({"msg": "Chat summary saved successfully"}), 201
+
 @app.route("/logout", methods=['POST'])
 def save_chat_summary():
     data = request.json
+    # Retrieve the document by session_id
+    existing_record = chat_summaries_collection.find_one({'session_id': data['session_id']})
 
     # Check if the required fields are present
-    if not data.get('email') or not data.get('chat_history'):
-        return jsonify({"msg": "'email' and 'chat_history' are required"}), 400
+    if not data.get('email') or not data.get('chat_history') or not data.get('session_id'):
+        return jsonify({"msg": "'email' and 'chat_history' and 'session_id' are required"}), 400
 
     summary = generate_summary(data["chat_history"])
-    chat_title = generate_chat_title(summary)
-    
+    chat_title = "chat 1"
+    print(data["chat_history"])
     chat_details = {
         'email': data['email'],
         'chat_history' : data['chat_history'],
@@ -430,9 +456,19 @@ def save_chat_summary():
         'timestamp': datetime.utcnow(), 
     }
 
-    chat_summaries_collection.insert_one(chat_details)
-    
-    return jsonify({"msg": "Chat summary saved successfully"}), 201
+    # chat_summaries_collection.insert_one(chat_details)
+    # Update the document by adding fields directly to it
+    try:
+        chat_summaries_collection.update_one(
+            {'session_id': data['session_id']},  # Find the document by session_id
+            {'$set': chat_details}  # Update the document with the new fields
+        )
+        return jsonify({'message': 'Chat details added successfully'}), 201
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
 app.route("/dashboard", methods=['GET'])
 def get_prev_chat_details(email):
     # Find chat summaries for the specified email, sorted by timestamp (most recent first)

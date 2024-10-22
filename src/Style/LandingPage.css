@@ -21,23 +21,88 @@ body {
   margin-top: 100px;
 }
 
-/* Styling for the typing effect text */
-.typing-effect span {
+.gradient-heading {
+  font-size: 100px;
   background: linear-gradient(to right, #567350, #e6f4e4);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  text-fill-color: transparent;
-  font-size: 200px;
+  color: transparent;
+  margin: 0;
   font-family: 'Courier New', Courier, monospace;
+  text-align: center; /* Center align the text */
+  margin: 4rem 0;
 }
 
-/* Team container for displaying team member cards */
-.team-container {
+/* Main container for centering the box on the page */
+.info-box-container {
   display: flex;
-  flex-wrap: wrap; /* Allow cards to wrap to the next line */
-  justify-content: center; /* Center the cards */
-  padding: 20px; /* Padding around the container */
+  justify-content: center;
+  align-items: center;
+  height: 100vh; /* Full viewport height */
+  /* background-color: #e6f4e4; Parent background color */
+}
+
+/* Box with dotted border and centered content */
+.info-box {
+  background-color: black; 
+  /* padding: 40px; */
+  border: 2px dotted #567350; /* Dotted border with green color */
+  border-radius: 10px;
+  max-width: 600px;
+  text-align: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+/* Heading styling with gradient text */
+.info-box-heading {
+  font-size: 2.5rem;
+  background: linear-gradient(to right, #a0b89c, #f0ffe4); /* Whitish-green gradient */
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: transparent;
+  margin-bottom: 20px;
+  font-weight: bold;
+}
+
+/* Paragraph styling */
+.info-box-text {
+  margin: 20px 0;
+  font-size: 1.2rem;
+  color: #2c9a4d; /* Darker green for readability */
+  line-height: 1.6;
+}
+
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .info-box {
+    padding: 20px;
+  }
+  .info-heading {
+    font-size: 2rem;
+  }
+  .info-text {
+    font-size: 1rem;
+  }
+  .info-button {
+    font-size: 0.9rem;
+  }
+}
+
+
+/* Styling for the typing effect text */
+.typing-effect span {
+background: linear-gradient(to right, #567350, #e6f4e4);
+-webkit-background-clip: text;
+-webkit-text-fill-color: transparent;
+background-clip: text;
+text-fill-color: transparent;
+font-size: 200px; /* Font size for the first heading */
+font-family: 'Courier New', Courier, monospace;
+text-align: center; /* Center align the text */
 }
 
 /* Card styling */
