@@ -19,6 +19,7 @@ from pymongo.server_api import ServerApi
 from question_reccomender import question_recc
 from summary import generate_summary
 from rag import get_ans
+from rag import update_store
 from datetime import datetime
 import bcrypt
 from langchain_qdrant import QdrantVectorStore
@@ -217,7 +218,6 @@ PORT = os.environ.get('PORT', 5000)
 #     result = question_recc(filetext)
 
 #     return jsonify({'message': result}), 200
-
 @app.route('/upload', methods=['POST'])
 def upload_files():
     session_id = request.form.get('session_id')
@@ -496,14 +496,23 @@ def get_prev_chat_details(email):
 app.route("/user_chat", methods=['GET'])
 def get_prev_chat_details():
     
-    data = request.json
-    # Check if the required fields are present
-    if not data.get('email') or not data.get('chat_title'):
-        return jsonify({"msg": "'email' and 'chat_title' are required"}), 400
+    # data = request.json
+    # # Check if the required fields are present
+    # if not data.get('email') or not data.get('chat_title'):
+    #     return jsonify({"msg": "'email' and 'chat_title' are required"}), 400
     
-    # Find chat summaries for the specified email, sorted by timestamp (most recent first)
-    chat_details = chat_summaries_collection.find({'email': data['email'], 'chat_title': data['chat_title']}).sort('timestamp', -1)
+    # # Find chat summaries for the specified email, sorted by timestamp (most recent first)
+    # chat_details = chat_summaries_collection.find({'email': data['email'], 'chat_title': data['chat_title']}).sort('timestamp', -1)
+    data = request.json
+    # Retrieve the document by session_id
+    chat_details = chat_summaries_collection.find_one({'session_id': data['session_id']})
 
+    # Check if the required fields are present
+    if not data.get('email') or not data.get('chat_history') or not data.get('session_id'):
+        return jsonify({"msg": "'email' and 'chat_history' and 'session_id' are required"}), 400
+
+    # summary = generate_summary(data["chat_history"])
+    update_store(chat_details['chat_history'],chat_details['session_id'])
     # Convert the cursor to a list of summaries
     chat_details_list = []
     chat_details_list.append({

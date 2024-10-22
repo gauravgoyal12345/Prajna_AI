@@ -40,17 +40,17 @@ api_key=os.getenv('api_key')
 
 # print(client.get_collections())
 
-def split_text(text):
-    text_splitter = CharacterTextSplitter(
-    separator="\n",
-    chunk_size=2500,
-    chunk_overlap=200,
-    length_function=len,
-    is_separator_regex=False,
-        )
-    chunks = text_splitter.split_text(text)
-    documents = [Document(page_content=chunk) for chunk in chunks]
-    return documents
+# def split_text(text):
+#     text_splitter = CharacterTextSplitter(
+#     separator="\n",
+#     chunk_size=2500,
+#     chunk_overlap=200,
+#     length_function=len,
+#     is_separator_regex=False,
+#         )
+#     chunks = text_splitter.split_text(text)
+#     documents = [Document(page_content=chunk) for chunk in chunks]
+#     return documents
 
 
 
@@ -166,11 +166,27 @@ client = QdrantClient(
 )
 
 store = {}
+x = True
+
+def update_store(chat_history,collection_name):
+    store[collection_name] = ChatMessageHistory()
+
+
+    for pair in chat_history:
+        store[collection_name].add_user_message(pair['sender'])
+        store[collection_name].add_ai_message(pair['bot'])
+    print(store)    
+
+     
 
 def get_session_history(session_id: str) -> BaseChatMessageHistory:
         if session_id not in store:
             store[session_id] = ChatMessageHistory()
         return store[session_id]
+
+     
+     
+
     
 def get_VectorStore(collection_name):
     vectorstore = QdrantVectorStore(
@@ -180,9 +196,8 @@ def get_VectorStore(collection_name):
     )
     return vectorstore
      
-
 # print(client.get_collections())
-def get_ans(question,collection_name):
+def get_ans(question,collection_name, chat_history = None):
     
 #     vectorstore = QdrantVectorStore(
 #     client=client,
@@ -274,12 +289,22 @@ def get_ans(question,collection_name):
     #     if session_id not in store:
     #         store[session_id] = ChatMessageHistory()
     #     return store[session_id]
-    
-    # store[collection_name] = ChatMessageHistory()
-    # store[collection_name].add_user_message('what doc about')
-    # store[collection_name].add_ai_message('This document describes a project...')
-    # store[collection_name].add_user_message('what diseases')
-    # store[collection_name].add_ai_message('The document mentions several lung diseases...')
+    # if chat_history is not None and x is True:
+        # store[collection_name] = ChatMessageHistory()
+
+
+        # for pair in chat_history:
+        #     store[collection_name].add_user_message(pair['sender'])
+        #     store[collection_name].add_ai_message(pair['bot'])
+
+
+             
+        # store[collection_name] = ChatMessageHistory()
+        # store[collection_name].add_user_message('what doc about')
+        # store[collection_name].add_ai_message('This document describes a project...')
+        # store[collection_name].add_user_message('what diseases')
+        # store[collection_name].add_ai_message('The document mentions several lung diseases...')
+        # x = False
     # get_session_history = store[collection_name]
     conversational_rag_chain = RunnableWithMessageHistory(
         rag_chain,
@@ -308,6 +333,6 @@ def get_ans(question,collection_name):
 #     print(" ")
 #     print(get_ans(question,"demo7"))
 #     print(" ")
-# EncodingWarning
+# # EncodingWarning
 
 # get_ans("what is the name","demo4")
