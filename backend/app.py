@@ -313,13 +313,13 @@ def get_prev_chat_details():
         return jsonify({"msg": "'email' and 'chat_title' are required"}), 400
     
     # Find chat summaries for the specified email, sorted by timestamp (most recent first)
-    chat_details = chat_summaries_collection.find({'email': email, 'chat_title': }).sort('timestamp', -1)
+    chat_details = chat_summaries_collection.find({'email': data['email'], 'chat_title': data['chat_title']}).sort('timestamp', -1)
 
     # Convert the cursor to a list of summaries
     chat_details_list = []
     chat_details_list.append({
-        'chat_history': details['chat_history'],
-        'timestamp': details['timestamp'],
+        'chat_history': chat_details['chat_history'],
+        'timestamp': chat_details['timestamp'],
     })
 
     # Check if any summaries were found
