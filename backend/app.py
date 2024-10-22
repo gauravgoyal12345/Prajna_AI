@@ -555,10 +555,28 @@ def handle_user_query():
     email = data['email']
     question = data['question']
     session_id = data['session_id']
+    print("sessionId is" + session_id)
+    chat_details = chat_summaries_collection.find_one({'session_id': data['session_id']})
+    pdf_names = chat_details['pdf_names']
+    pdf_links = chat_details['pdf_links']
 
     # Call the LLM to get the answer to the user's question
     answer,citations = get_ans(question, session_id)
     print(citations)
+    
+    def get_source_index(source, pdf_names):
+        try:
+            return pdf_names.index(source)
+        except ValueError:
+            return -1
+        
+    for citation in citations:
+        source = citation['source_pdf']
+        source_index = get_source_index(source, pdf_names)
+        link = pdf_links[source_index]['file_url']
+        citation["source_link"] = link 
+        
+    
 
     return jsonify({"msg": "Query handled successfully", "question": question, "answer": answer,"citations":citations}), 200
 

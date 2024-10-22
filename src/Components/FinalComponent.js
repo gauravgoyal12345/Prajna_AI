@@ -10,8 +10,13 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@mui/material'; // Import Button from Material-UI
 import MicIcon from '@mui/icons-material/Mic';
 import StopIcon from '@mui/icons-material/Stop';
+import PdfViewer from './PdfViewer';
+import { getDocument } from 'pdfjs-dist/build/pdf';
+import ReactDOM from 'react-dom';
 
 function FinalComponents() {
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.12.313/pdf.min.js"></script>
 
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [input, setInput] = useState('');
@@ -29,6 +34,91 @@ function FinalComponents() {
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
   const navigate = useNavigate();
+
+  const openPdfInNewTab = (pdfUrl, pageNum) => {
+    // Create a panel for the PDF
+    const pdfPanel = document.createElement('div');
+    pdfPanel.style.position = 'fixed';
+    pdfPanel.style.left = '0';
+    pdfPanel.style.top = '0';
+    pdfPanel.style.width = '400px'; // Set your desired width
+    pdfPanel.style.height = '100%';
+    pdfPanel.style.backgroundColor = 'white';
+    pdfPanel.style.boxShadow = '2px 0 5px rgba(0,0,0,0.5)';
+    pdfPanel.style.zIndex = '9999';
+    pdfPanel.style.display = 'flex';
+    pdfPanel.style.flexDirection = 'column';
+    pdfPanel.style.alignItems = 'center';
+    pdfPanel.style.overflowY = 'auto'; // Allow scrolling if content overflows
+
+    // Create a close button
+    const closeButton = document.createElement('button');
+    closeButton.innerText = '✖'; // Cross symbol
+    closeButton.style.position = 'absolute';
+    closeButton.style.top = '10px';
+    closeButton.style.right = '10px';
+    closeButton.style.fontSize = '20px';
+    closeButton.style.border = 'none';
+    closeButton.style.backgroundColor = 'transparent';
+    closeButton.style.cursor = 'pointer';
+
+    // Append the close button to the panel
+    pdfPanel.appendChild(closeButton);
+
+    // Add event listener to close the panel
+    closeButton.addEventListener('click', () => {
+        document.body.removeChild(pdfPanel); // Remove the panel from the body
+    });
+
+    document.body.appendChild(pdfPanel); // Append the panel to the body
+
+    // Create a canvas to render the PDF page
+    const canvas = document.createElement('canvas');
+    pdfPanel.appendChild(canvas); // Append the canvas to the panel
+
+    // Load the PDF document
+    getDocument(pdfUrl).promise.then(pdf => {
+        console.log('PDF loaded successfully');
+
+        pdf.getPage(pageNum).then(page => {
+            console.log(`Page ${pageNum} loaded successfully`);
+            const scale = 1.5; // Adjust scale as needed
+            const viewport = page.getViewport({ scale });
+
+            canvas.height = viewport.height;
+            canvas.width = viewport.width;
+
+            const renderContext = {
+                canvasContext: canvas.getContext('2d'),
+                viewport: viewport,
+            };
+
+            // Render the page into the canvas context
+            page.render(renderContext).promise.then(() => {
+                console.log('Page rendered successfully');
+            }).catch(error => {
+                console.error('Error rendering page: ', error);
+                displayErrorMessage(pdfPanel, 'Error rendering PDF page.');
+            });
+        }).catch(error => {
+            console.error('Error getting PDF page: ', error);
+            displayErrorMessage(pdfPanel, 'Error getting PDF page.');
+        });
+    }).catch(error => {
+        console.error('Error loading PDF: ', error);
+        displayErrorMessage(pdfPanel, 'Error loading PDF document.');
+    });
+};
+
+// Function to display error message in the panel
+const displayErrorMessage = (panel, message) => {
+    const errorMessage = document.createElement('div');
+    errorMessage.innerText = message;
+    errorMessage.style.color = 'red';
+    errorMessage.style.marginTop = '20px';
+    errorMessage.style.textAlign = 'center'; // Center the error message
+    panel.appendChild(errorMessage);
+};
 
   const handleMenuClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -344,7 +434,7 @@ function FinalComponents() {
                         repeat={0}   // Don't repeat
                       />
 
-                      {msg.citations && msg.citations.length > 0 && (
+{msg.citations && msg.citations.length > 0 && (
                         <div className="citations">
                           <h4>Citations:</h4>
                           <ul>
@@ -353,14 +443,30 @@ function FinalComponents() {
                                 .filter(citation => citation.source_pdf.endsWith('.pdf'))  // Exclude sources not ending with '.pdf'
                                 .map(JSON.stringify)  // Stringify for unique set filtering
                             )].map((citation, index) => {
+                  
                               const parsedCitation = JSON.parse(citation);
                               const source = parsedCitation.source_pdf !== 'pdfs'
                                 ? parsedCitation.source_pdf
                                 : 'PDF File';  // Handle 'pdfs' as 'Unknown Source'
+                                <button key={index} onClick={() => openPdfInNewTab(citation.source_pdf, citation.page_num)}>
+                                Open Citation {index + 1} (Page {citation.page_num})
+                              </button>
                               return (
-                                <li key={index}>
-                                  {`Page ${parsedCitation.page_num}, Paragraph ${parsedCitation.paragraph_num}, Source: ${source}`}
-                                </li>
+                              <li key={index}>
+                              {`Page ${parsedCitation.page_num}, Paragraph ${parsedCitation.paragraph_num}, Source: `}
+                              <a 
+                                href = {parsedCitation.source_link}
+                                target="_blank" 
+                                rel="noopener noreferrer" 
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  openPdfInNewTab(parsedCitation.source_link, parsedCitation.page_num); 
+                                }}
+                              >
+                                {source}
+                              </a>
+                            </li>
+
                               );
                             })}
                           </ul>
