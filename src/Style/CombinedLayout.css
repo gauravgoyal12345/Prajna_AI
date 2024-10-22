@@ -9,7 +9,7 @@
 /* Left container for PdfUpload component */
 .left-container {
   width: 20%;           /* 20% of the width */
-  background-color: #1A223F; /* Light gray background */
+  background-color: #000000; /* Light gray background */
   /* padding: 20px; */
   box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1); /* Subtle shadow on right side */
   display: flex;
@@ -79,4 +79,29 @@
 
 .citations li {
   margin-bottom: 5px;
+}
+
+.mic-button {
+  background-color: #3d8b69 !important; /* Force your button color */
+  margin-left: 10px !important; /* Margin for the button */
+  color: white !important; /* Text color */
+  padding: 10px 20px !important; /* Padding for the button */
+  border-radius: 30px !important; /* Rounded corners */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important; /* Subtle shadow for depth */
+  transition: background-color 0.3s !important;
+   transform: 0.2s !important; /* Transition effects */
+}
+
+.mic-button:hover {
+  background-color: #28a745 !important; /* Darker pink on hover */
+  transform: scale(1.05) !important; /* Scale on hover */
+}
+
+
+.mic-button:focus {
+  outline: none; /* Remove default focus outline */
+}
+
+.mic-button .MuiButton-startIcon {
+  margin-right: 8px; /* Space between icon and text */
 }

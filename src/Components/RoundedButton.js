@@ -1,13 +1,14 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import '../Style/RoundedButton.css'; // You can use a separate CSS file or inline styling
 
-const RoundedButton = (props) => {
-  const {routeLink, label, onClick} = props;
-    return (
-    <Link to={routeLink} className="rounded-button">
+const RoundedButton = ({ routeLink, label, style, onClick }) => {
+  return (
+    <button
+      className="rounded-button"
+      style={style}
+      onClick={onClick || (() => window.location.href = routeLink)} // If onClick is provided, use it, else use routeLink
+    >
       {label}
-    </Link>
+    </button>
   );
 };
 

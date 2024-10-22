@@ -5,10 +5,11 @@ import '../Style/CombinedLayout.css'; // Combined styles
 import axios from 'axios';
 import { Alert } from "antd";
 import { TypeAnimation } from 'react-type-animation';
-import MicIcon from '@mui/icons-material/Mic';
-import StopIcon from '@mui/icons-material/Stop';
 import { IconButton, Avatar, Menu, MenuItem } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import { Button } from '@mui/material'; // Import Button from Material-UI
+import MicIcon from '@mui/icons-material/Mic';
+import StopIcon from '@mui/icons-material/Stop';
 
 function FinalComponents() {
 
@@ -383,9 +384,14 @@ function FinalComponents() {
                 placeholder="Type your message..."
                 rows={1}
               />
-              <button className="mic-button" onClick={handleMicClick}>
-                {isListening ? <StopIcon /> : <MicIcon />}
-              </button>
+              <Button
+                className="mic-button"
+                onClick={handleMicClick}
+                variant="contained" // Use Material-UI variant for a raised button effect
+                startIcon={isListening ? <StopIcon /> : <MicIcon />} // Use icons from MUI
+              >
+                {isListening ? 'Stop Listening' : 'Start Listening'}
+              </Button>
               <button className='chat-button' onClick={() => handleSendMessage()}>Send</button>
             </div>
           </div>

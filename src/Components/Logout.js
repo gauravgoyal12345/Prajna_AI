@@ -121,7 +121,7 @@ function LogOut() {
       }}
       onCancel={handleCancel}
     >
-      <RoundedButton2 label="LogOut" onClick={showPopconfirm}></RoundedButton2>
+      <RoundedButton2 label="LogOut" onClick={showPopconfirm} style={{ backgroundColor: 'black', color: 'white' }}></RoundedButton2>
     </Popconfirm>
   );
 }

@@ -5,8 +5,10 @@ body {
   margin: 0;
   padding: 0;
   background-color: black;
-  color: white; /* Ensures all text is white */
-  overflow-x: hidden; /* Prevent horizontal scroll */
+  color: white;
+  /* Ensures all text is white */
+  overflow-x: hidden;
+  /* Prevent horizontal scroll */
 }
 
 /* Main container that holds the landing page content */
@@ -15,20 +17,24 @@ body {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: calc(100vh - 45vh);
+  height: calc(100vh - 20vh);
+  /* Dynamic height based on viewport */
   background-color: black;
   text-align: center;
 }
 
+/* Gradient heading with dynamic font size */
 .gradient-heading {
-  font-size: 100px;
+  font-size: clamp(2rem, 8vw, 5rem);
+  /* Responsive font size */
   background: linear-gradient(to right, #567350, #e6f4e4);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   color: transparent;
-  margin: 2rem 0;
-  padding-left: 10px;
+  margin: clamp(1rem, 4vh, 2rem) 0;
+  /* Dynamic margin */
+  padding-left: 1rem;
 }
 
 /* Styling for the typing effect text */
@@ -38,102 +44,119 @@ body {
   -webkit-text-fill-color: transparent;
   background-clip: text;
   text-fill-color: transparent;
-  font-size: 200px; /* Font size for the first heading */
+  font-size: clamp(3rem, 10vh, 10rem);
+  /* Dynamic font size based on viewport height */
   font-family: 'Courier New', Courier, monospace;
-  text-align: center; /* Center align the text */
+  text-align: center;
+  margin-bottom: 5vh;
+  /* Spacing based on viewport height */
 }
 
-.team-container{
-  margin-left: 100px;
+.team-container {
+  margin-left: 5vw;
+  /* Responsive margin */
 }
+
 /* Card styling */
 .team-container .MuiCard-root {
-  background-color: #ffffff; /* Light background for cards */
-  border-radius: 8px; /* Rounded corners */
-  padding: 15px; /* Inner spacing */
-  margin: 10px; /* Space around cards */
-  transition: transform 0.3s, box-shadow 0.3s; /* Animation on hover */
-  text-align: center; /* Center text inside the card */
-  width: 300px; /* Decrease width of the cards */
-  height: 380px; /* Decrease height of the cards */
+  background-color: #ffffff;
+  border-radius: 8px;
+  padding: 1rem;
+  margin: clamp(0.5rem, 2vh, 1rem);
+  /* Dynamic margin */
+  margin-top: 2rem;
+  /* Increase top margin */
+  transition: transform 0.3s, box-shadow 0.3s;
+  text-align: center;
+  width: 80vw;
+  /* Responsive width */
+  max-width: 300px;
+  height: auto;
 }
 
 /* Hover effect for card enlargement */
 .team-container .MuiCard-root:hover {
-  transform: scale(1.05); /* Slightly enlarge on hover */
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3); /* Add shadow on hover for depth */
+  transform: scale(1.05);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
 }
 
 .team-container .MuiCard-root img {
-  width: 100%; /* Full width */
-  height: auto; /* Maintain aspect ratio */
-  border-radius: 8px; /* Rounded corners for images */
-  margin-bottom: 10px; /* Space between image and text */
+  width: 100%;
+  height: 250px;
+  border-radius: 8px;
+  margin-bottom: clamp(0.5rem, 2vh, 1rem);
+  /* Dynamic margin */
 }
 
-/* Responsive adjustments for the cards */
-@media (max-width: 768px) {
+/* Responsive adjustments */
+@media (min-width: 768px) {
   .team-container .MuiCard-root {
-    width: 90%; /* Make cards wider on smaller screens */
-    margin: 10px; /* Maintain margin for spacing */
+    width: calc(50vw - 2rem);
+    /* Half of screen width minus margins */
   }
 }
 
-@media (max-width: 480px) {
+@media (min-width: 1024px) {
   .team-container .MuiCard-root {
-    width: 95%; /* Further adjust card width for mobile */
-    margin: 5px; /* Reduce margin for mobile screens */
+    width: calc(33vw - 2rem);
+    /* One-third of screen width minus margins */
   }
 }
 
 /* Icons for LinkedIn and GitHub */
 .social-icons {
   display: flex;
-  justify-content: center; /* Center icons */
-  margin-top: 10px; /* Space above icons */
+  justify-content: center;
+  margin-top: clamp(0.5rem, 2vh, 1rem);
+  /* Dynamic margin */
 }
 
+/* Features container */
 .features-container {
-  border-radius: 8px; /* Rounded corners */
-  margin: auto; /* Center the container with margin */
-  margin-bottom: 30px; /* Add margin bottom for spacing below the container */
-  max-width: 1200px; /* Maximum width for larger screens */
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); /* Soft shadow effect */
+  border-radius: 8px;
+  margin: clamp(0.5rem, 3vh, 1.5rem) auto;
+  /* Reduced dynamic margin */
+  padding: 1rem;
+  max-width: 90%;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
 }
+
 
 /* Adjust feature title */
 .feature-title {
-  font-size: 1.5rem; /* Title font size */
-  font-weight: bold; /* Bold text */
-  margin-bottom: 10px; /* Space below the title */
-  color: #e6f4e4; /* Light green color for title */
-  height: 50px; /* Set a fixed height to align all titles */
-  margin-bottom: 10px;
+  font-size: clamp(1rem, 2.5vw, 1.5rem);
+  font-weight: bold;
+  margin-bottom: clamp(0.5rem, 2vh, 1rem);
+  /* Dynamic margin */
+  color: #e6f4e4;
+  height: auto;
 }
 
 /* Description remains the same */
 .feature-description {
-  padding-top: 20px;
-  font-size: 1rem; /* Description font size */
-  color: #ffffff; /* White text color for readability */
-  line-height: 1.5; /* Line height for better spacing */
+  padding-top: 1rem;
+  font-size: clamp(0.8rem, 2vw, 1rem);
+  color: #ffffff;
+  line-height: 1.5;
 }
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .typing-effect span {
-    font-size: 150px; /* Adjust font size for smaller screens */
+    font-size: clamp(2rem, 10vh, 6rem);
+    /* Dynamic font size */
   }
 
   .features-container {
-    padding: 20px; /* Less padding on smaller screens */
+    padding: clamp(1rem, 3vh, 2rem);
+    /* Dynamic padding */
   }
 
   .feature-title {
-    font-size: 1.3rem; /* Smaller title font size */
+    font-size: clamp(0.9rem, 2vw, 1.3rem);
   }
 
   .feature-description {
-    font-size: 0.9rem; /* Smaller description font size */
+    font-size: clamp(0.7rem, 1.8vw, 0.9rem);
   }
 }

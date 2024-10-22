@@ -1,12 +1,13 @@
 import React from 'react';
 import '../Style/RoundedButton2.css'; // External CSS file for styling
 
-const RoundedButton2 = ({ label, onClick, disabled }) => {
+const RoundedButton2 = ({ label, onClick, disabled, style}) => {
   return (
     <button 
       className="rounded-button" 
       onClick={onClick} 
       disabled={disabled}
+      style={style}
     >
       {label}
     </button>
