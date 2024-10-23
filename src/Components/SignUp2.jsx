@@ -80,7 +80,7 @@ export default function SignUpForm() {
         setLoadingState(true);
         const {confirmPassword, ...dataToSend} = signUpData;
         setSubmitted(true);
-        const response = await axios.post("http://localhost:5000/register", dataToSend);
+        const response = await axios.post("https://prajna-ai-f6r7.onrender.com/register", dataToSend);
         
         if(response.status === 201){
           toast.success("Registration Successful! Redirecting to Login...", { position: "top-center" });

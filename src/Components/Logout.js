@@ -86,7 +86,7 @@ function LogOut() {
     setConfirmLoading(true);
     try {
       console.log(logOutData);
-      // const response = await axios.post("http://localhost:5000/logout", logOutData);
+      // const response = await axios.post("https://prajna-ai-f6r7.onrender.com/logout", logOutData);
       // console.log(response);
       localStorage.removeItem("userDetails");
       localStorage.removeItem("chatMessages");

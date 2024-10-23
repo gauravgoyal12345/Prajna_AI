@@ -117,7 +117,7 @@ const LandingPage = () => {
 
     try {
       console.log(logOutData);
-      const response = await axios.post("http://localhost:5000/logout", logOutData);
+      const response = await axios.post("https://prajna-ai-f6r7.onrender.com/logout", logOutData);
 
       if (response.status === 201) {
         localStorage.removeItem("chatMessages");

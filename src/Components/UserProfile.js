@@ -20,7 +20,7 @@ function UserProfile() {
         
     //     if (userEmail) {
     //         // Fetch data from the API on page load
-    //         axios.post('http://localhost:5000/dashboard', {
+    //         axios.post('https://prajna-ai-f6r7.onrender.com/dashboard', {
     //             email: userEmail // Send email in the request body
     //         })
     //             .then(response => {
@@ -70,7 +70,7 @@ function UserProfile() {
 
         if (userEmail) {
             // Fetch data from the API on page load
-            axios.post('http://localhost:5000/dashboard', {
+            axios.post('https://prajna-ai-f6r7.onrender.com/dashboard', {
                 email: userEmail // Send email in the request body
             })
                 .then(response => {
@@ -111,7 +111,7 @@ function UserProfile() {
     const handleChatClick = async (sessionId) => {
         // setLoadingState(true); // Uncomment if using loading state management
         try {
-            const response = await axios.post('http://localhost:5000/user_chat', { session_id: sessionId });
+            const response = await axios.post('https://prajna-ai-f6r7.onrender.com/user_chat', { session_id: sessionId });
             // const chatMessages = response.data.chat_history;
             setChatMessages(response.data[0].chat_history)
             console.log(response);
