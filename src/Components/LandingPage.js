@@ -93,7 +93,7 @@ const LandingPage = () => {
           result.push({
             sender: userMessage,  // User message
             bot: botMessage,      // Bot message
-            citations: botCitations || undefined // Add concatenated citations string if exists
+            // citations: botCitations || undefined // Add concatenated citations string if exists
           });
           userMessage = "";  // Reset userMessage after storing the pair
         }
