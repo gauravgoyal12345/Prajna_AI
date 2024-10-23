@@ -11,7 +11,6 @@ import { Flex, Spin } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { v4 as uuidv4 } from 'uuid';
 const validator = require('validator');
 
 
@@ -102,16 +101,10 @@ export default function LogInForm() {
         let userData = response.data.user;
 
         if (typeof userData === 'object' && userData !== null) {
-          const uId = uuidv4();
 
-          // Create a new object with all properties of userData and add uid
-          const newUserData = {
-            ...userData,   // Spread existing userData properties
-            uid: uId      // Add new uid field
-          };
 
           // Store the new object in localStorage
-          localStorage.setItem('userDetails', JSON.stringify(newUserData));
+          localStorage.setItem('userDetails', JSON.stringify(userData));
 
           // console.log('New User Data:', newUserData);  // For debugging
           toast.success("Login successful!", {

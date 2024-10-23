@@ -52,6 +52,7 @@ function Navbar() {
                     {logOut &&
                         <>
                             <RoundedButton routeLink="/upload" label="PDF Genie" style={{ backgroundColor: 'black', color: 'white' }} />
+                            <RoundedButton routeLink="/profile" label="Profile" style={{ backgroundColor: 'black', color: 'white' }} />
                         </>}
                     {!logOut &&
                         <>

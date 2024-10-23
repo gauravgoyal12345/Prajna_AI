@@ -13,6 +13,8 @@ import StopIcon from '@mui/icons-material/Stop';
 import PdfViewer from './PdfViewer';
 import { getDocument } from 'pdfjs-dist/build/pdf';
 import ReactDOM from 'react-dom';
+import { Popconfirm } from "antd"; 
+import { v4 as uuidv4 } from 'uuid';
 
 function FinalComponents() {
 
@@ -32,6 +34,10 @@ function FinalComponents() {
   const [sessionID, setSessionID] = useState('');
   const [isListening, setIsListening] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
+  const [openLogOut, setOpenLogOut] = useState(false);
+  const [confirmLoading, setConfirmLoading] = useState(false);
+  
+
   const open = Boolean(anchorEl);
   const navigate = useNavigate();
 
@@ -130,10 +136,38 @@ const displayErrorMessage = (panel, message) => {
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem('userDetails'));
-    if (user) {
+    const storedMessages = JSON.parse(localStorage.getItem('chatMessages')) || [];
+    if(storedMessages){
+      setMessages(storedMessages);
+    }
+      if (user) {
       setSessionID(user.uid);
     }
   }, []);
+
+  
+  useEffect(() => {
+    const userDetails = JSON.parse(localStorage.getItem("userDetails"));
+
+    if (userDetails) {
+      // Only generate a new UID if it doesn't exist
+      if (!userDetails.uid) {
+        const newUID = uuidv4(); // Generate a new UID
+        setSessionID(newUID);
+        console.log(newUID);
+
+        // Create a new object with the same details but updated UID
+        const updatedUserDetails = {
+          ...userDetails,
+          uid: newUID // Overwrite only the UID
+        };
+
+        // Store the updated user details back in localStorage
+        localStorage.setItem("userDetails", JSON.stringify(updatedUserDetails));
+      }
+    }
+  }, []);  // Empty dependency array ensures this runs on mount
+
 
   const handleFileUpload = async (event) => {
 
@@ -189,16 +223,16 @@ const displayErrorMessage = (panel, message) => {
   useEffect(() => {
     const userChat = JSON.parse(localStorage.getItem('chatMessages'));
     const user = JSON.parse(localStorage.getItem('userDetails'));
-
+    setUserData(user);
     if (userChat && userChat.length > 0) {
       setUserChatMessages(userChat);
       setMessages(userChat);  // Load previous chat messages if available
     } 
-    if (user) {
+    if (user && !(userChat || userChat.length > 0)) {
       // If there are no chat messages, set the welcome message
       setUserData(user);
       setMessages([ 
-        { sender: "bot", text: `Hi ${user.name}! I am PDF-Genie, your personal guide to interact with things?` }
+        { sender: "bot", text: `Hi ${user.name}! I am PDF-Genie, your personal guide to interact with your documents?` }
       ]);
     }
 
@@ -237,6 +271,71 @@ const displayErrorMessage = (panel, message) => {
     return result;
   };
 
+  const convertChatDataToLogOut = (chatData) => {
+    const result = [];
+    let userMessage = "";
+    let botMessage = "";
+    
+    for (let i = 1; i < chatData.length; i++) {
+      const entry = chatData[i];
+      
+      if (entry.sender === "user") {
+        userMessage = entry.text;
+      } else if (entry.sender === "bot") {
+        botMessage = entry.text;
+        
+        if (userMessage) {
+          result.push({
+            sender: userMessage,  // User message
+            bot: botMessage       // Bot message
+          });
+          userMessage = "";  // Reset after storing
+        }
+      }
+    }
+    
+    return result;
+  };
+
+  
+  const showPopconfirm = () => {
+    setOpenLogOut(true);
+  };
+
+  const handleCancel = () => {
+    console.log('Clicked cancel button');
+    setOpenLogOut(false);
+  };
+   // Handle LogOut and API call
+   const handleOk = async () => {
+    const chatPairs = convertChatDataToLogOut(userChatMessages);
+    const logOutData = {
+      email: userData.email,
+      chat_history: chatPairs,
+      session_id: sessionID
+    };
+
+    try {
+      console.log(logOutData);
+      const response = await axios.post("http://localhost:5000/logout", logOutData);
+
+      if (response.status === 201) {
+        localStorage.removeItem("chatMessages");
+        localStorage.removeItem("userDetails");
+        setTimeout(() => {
+          navigate('/');
+          window.location.reload();
+        }, 100);
+
+      }
+    } catch (error) {
+      console.error("LogOut failed: ", error);
+    }
+    setConfirmLoading(false);
+  };
+
+
+
 
   const formatResponse = (response) => {
     return response
@@ -256,6 +355,7 @@ const displayErrorMessage = (panel, message) => {
     try {
       const newMessages = [...messages, { sender: "user", text: message }];
       setMessages(newMessages);
+      setUserChatMessages(newMessages);
       setInput('');  // Clear input only for manual input case
 
       // Simulate a delay for bot response
@@ -410,7 +510,20 @@ const displayErrorMessage = (panel, message) => {
           >
             <MenuItem onClick={() => { handleMenuClose(); navigate("/profile"); }}>Profile</MenuItem>
             <MenuItem onClick={() => { handleMenuClose(); navigate("/"); }}>Home</MenuItem>
-            <MenuItem onClick={() => { handleMenuClose(); navigate("/logout"); }}>Logout</MenuItem>
+            {/* <MenuItem onClick={() => { handleMenuClose(); navigate("/logout"); }}>Logout</MenuItem> */}
+            <Popconfirm
+                placement="bottom"
+                title="LogOut Confirm"
+                content={"Are You Sure You Want to LogOut"}  // Updated prop
+                open={openLogOut}
+                onConfirm={handleOk}
+                okButtonProps={{
+                  loading: confirmLoading,
+                }}
+                onCancel={handleCancel}
+            >
+              <MenuItem onClick={showPopconfirm}>Logout</MenuItem>
+            </Popconfirm>
           </Menu>
         </div>
 
@@ -425,16 +538,17 @@ const displayErrorMessage = (panel, message) => {
                 >
                   {msg.sender === "bot" ? (
                     <>
-                      <TypeAnimation
+                    <p>{msg.text}</p>
+                      {/* <TypeAnimation
                         sequence={[
                           msg.text,  // The bot's response
                         ]}
                         wrapper="p"  // The wrapper element
-                        speed={0.1}    // Typing speed
+                        speed={-100}    // Typing speed
                         repeat={0}   // Don't repeat
-                      />
+                      /> */}
 
-{msg.citations && msg.citations.length > 0 && (
+        {msg.citations && msg.citations.length > 0 && (
                         <div className="citations">
                           <h4>Citations:</h4>
                           <ul>

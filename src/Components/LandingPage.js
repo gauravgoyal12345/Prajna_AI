@@ -16,8 +16,81 @@ import Abhinav from '../Assets/Abhinav.jpeg';
 import Pushkar from '../Assets/Pushkar.jpeg';
 import Chirag from '../Assets/Chirag.png';
 import Nandini from '../Assets/Nandini.jpeg';
-
+import { useEffect } from 'react';
+import axios from 'axios';
 const LandingPage = () => {
+
+  const checkLocalStorageAndTrigger = () => {
+    const userDetails = JSON.parse(localStorage.getItem('userDetails'));
+    const chatMessage = JSON.parse(localStorage.getItem('chatMessages'));
+    // Check if both exist and their lengths are greater than 1
+    if (userDetails && chatMessage && chatMessage.length > 1) {
+      debugger;
+      handleOk(userDetails, chatMessage); // Call your handleOk function
+      // return;
+    }
+    if(userDetails){
+      delete userDetails.uid;
+      // Store the updated userDetails back in localStorage
+       localStorage.setItem('userDetails', JSON.stringify(userDetails));
+    }
+  };
+
+// Use useEffect to call the check function when the component is mounted
+  useEffect(() => {
+      checkLocalStorageAndTrigger();
+  }, []); 
+
+  const convertChatDataToLogOut = (chatData) => {
+    const result = [];
+    let userMessage = "";
+    let botMessage = "";
+    
+    for (let i = 1; i < chatData.length; i++) {
+      const entry = chatData[i];
+      
+      if (entry.sender === "user") {
+        userMessage = entry.text;
+      } else if (entry.sender === "bot") {
+        botMessage = entry.text;
+        
+        if (userMessage) {
+          result.push({
+            sender: userMessage,  // User message
+            bot: botMessage       // Bot message
+          });
+          // userMessage = "";  // Reset after storing
+        }
+      }
+    }
+    
+    return result;
+  };
+
+
+   // Handle LogOut and API call
+   const handleOk = async (userDetails, chatMessage) => {
+    console.log(chatMessage);
+    const chatPairs = convertChatDataToLogOut(chatMessage);
+    const logOutData = {
+      email: userDetails.email,
+      chat_history: chatPairs,
+      session_id: userDetails.uid
+    };
+    console.log(logOutData);
+
+    try {
+      console.log(logOutData);
+      const response = await axios.post("http://localhost:5000/logout", logOutData);
+
+      if (response.status === 201) {
+        localStorage.removeItem("chatMessages");
+      }
+    } catch (error) {
+      console.error("LogOut failed: ", error);
+    }
+  };
+
   const teamMembers = [
     {
       name: 'Chirag Garg',

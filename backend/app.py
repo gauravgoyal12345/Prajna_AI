@@ -442,18 +442,20 @@ def loginUser():
 def save_chat_summary():
     data = request.json
     # Retrieve the document by session_id
-    existing_record = chat_summaries_collection.find_one({'session_id': data['session_id']})
+    # existing_record = chat_summaries_collection.find_one({'session_id': data['session_id']})
 
     # Check if the required fields are present
     if not data.get('email') or not data.get('chat_history') or not data.get('session_id'):
         return jsonify({"msg": "'email' and 'chat_history' and 'session_id' are required"}), 400
 
+    if not data.get('chat_history') :
+        return jsonify({'message': 'Chat details not availaible'}), 201
     summary = generate_summary(data["chat_history"])
     chat_title = "chat 1"
-    print(data["chat_history"])
+    print("chat history --> ", data["chat_history"])
     chat_details = {
         'email': data['email'],
-        'chat_history' : data['chat_history'],
+        # 'chat_history' : data['chat_history'],
         'summary': summary,
         'chat_title' : chat_title,
         'timestamp': datetime.utcnow(), 
@@ -462,10 +464,18 @@ def save_chat_summary():
     # chat_summaries_collection.insert_one(chat_details)
     # Update the document by adding fields directly to it
     try:
+        # chat_summaries_collection.update_one(
+        #     {'session_id': data['session_id']},  # Find the document by session_id
+        #     {'$set': chat_details}  # Update the document with the new fields
+        # )
         chat_summaries_collection.update_one(
             {'session_id': data['session_id']},  # Find the document by session_id
-            {'$set': chat_details}  # Update the document with the new fields
+            {
+                '$set': chat_details,  # Update other fields (email, summary, etc.)
+                '$push': {'chat_history': {'$each': data['chat_history']}}  # Append new chat history
+            }
         )
+        
         return jsonify({'message': 'Chat details added successfully'}), 201
 
     except Exception as e:
@@ -495,14 +505,17 @@ def get_prev_chat_details():
     for details in chat_details:
         if(len(chat_details_list) == 3):
             break
-        chat_details_list.append({
-            'summary': details['summary'],
-            'chat_title' : details['chat_title'],
-            'timestamp': details['timestamp'],
-            'pdf_links': details['pdf_links'],
-            'pdf_names': details['pdf_names'],
-            'session_id': details['session_id'],
-        })
+        pdf_links = details.get('pdf_links')
+        pdf_names = details.get('pdf_names')
+        if (pdf_links is not None and pdf_names is not None):
+            chat_details_list.append({
+                'summary': details['summary'],
+                'chat_title' : details['chat_title'],
+                'timestamp': details['timestamp'],
+                'pdf_links': details['pdf_links'],
+                'pdf_names': details['pdf_names'],
+                'session_id': details['session_id'],
+            })
 
     # Check if any summaries were found
     if not chat_details_list:
@@ -511,8 +524,42 @@ def get_prev_chat_details():
     return jsonify(chat_details_list), 200
 
 
-app.route("/user_chat", methods=['GET'])
-def get_prev_chat_details():
+# app.route("/user_chat", methods=['GET'])
+# def get_prev_chat_details():
+    
+#     # data = request.json
+#     # # Check if the required fields are present
+#     # if not data.get('email') or not data.get('chat_title'):
+#     #     return jsonify({"msg": "'email' and 'chat_title' are required"}), 400
+    
+#     # # Find chat summaries for the specified email, sorted by timestamp (most recent first)
+#     # chat_details = chat_summaries_collection.find({'email': data['email'], 'chat_title': data['chat_title']}).sort('timestamp', -1)
+#     data = request.json
+#     # Retrieve the document by session_id
+#     chat_details = chat_summaries_collection.find_one({'session_id': data['session_id']})
+
+#     # Check if the required fields are present
+#     if not data.get('email') or not data.get('chat_history') or not data.get('session_id'):
+#         return jsonify({"msg": "'email' and 'chat_history' and 'session_id' are required"}), 400
+
+#     # summary = generate_summary(data["chat_history"])
+#     update_store(chat_details['chat_history'],chat_details['session_id'])
+#     # Convert the cursor to a list of summaries
+#     chat_details_list = []
+#     chat_details_list.append({
+#         'chat_history': chat_details['chat_history'],
+#         'timestamp': chat_details['timestamp'],
+#     })
+
+#     # Check if any summaries were found
+#     if not chat_details_list:
+#         return jsonify({"msg": "No previous chat details found for this user"}), 404
+
+#     return jsonify(chat_details_list), 200
+
+
+@app.route("/user_chat", methods=['POST'])
+def prev_chat_details():
     
     # data = request.json
     # # Check if the required fields are present
@@ -524,10 +571,11 @@ def get_prev_chat_details():
     data = request.json
     # Retrieve the document by session_id
     chat_details = chat_summaries_collection.find_one({'session_id': data['session_id']})
+    # print(chat_details)
 
     # Check if the required fields are present
-    if not data.get('email') or not data.get('chat_history') or not data.get('session_id'):
-        return jsonify({"msg": "'email' and 'chat_history' and 'session_id' are required"}), 400
+    if not data.get('session_id'):
+        return jsonify({"msg": "session id wanted"}), 400
 
     # summary = generate_summary(data["chat_history"])
     update_store(chat_details['chat_history'],chat_details['session_id'])
@@ -537,12 +585,13 @@ def get_prev_chat_details():
         'chat_history': chat_details['chat_history'],
         'timestamp': chat_details['timestamp'],
     })
-
+    print(chat_details)
     # Check if any summaries were found
     if not chat_details_list:
         return jsonify({"msg": "No previous chat details found for this user"}), 404
 
     return jsonify(chat_details_list), 200
+
 
 @app.route("/handle_query", methods=['POST'])
 def handle_user_query():

@@ -86,18 +86,16 @@ function LogOut() {
     setConfirmLoading(true);
     try {
       console.log(logOutData);
-      const response = await axios.post("http://localhost:5000/logout", logOutData);
+      // const response = await axios.post("http://localhost:5000/logout", logOutData);
       // console.log(response);
-      if (response.status === 201) {
-        setIsLogOut(true);
-        localStorage.removeItem("userDetails");
-        localStorage.removeItem("chatMessages");
-        setDescription("User Successfully Logged Out!");
-        setTimeout(() => {
-          navigate('/');
-          window.location.reload();
-        }, 100);
-      }
+      localStorage.removeItem("userDetails");
+      localStorage.removeItem("chatMessages");
+      setDescription("User Successfully Logged Out!");
+      setTimeout(() => {
+        navigate('/');
+        window.location.reload();
+      }, 100);
+
     } catch (error) {
       console.error("LogOut failed: ", error);
       setDescription("LogOut failed, please try again.");

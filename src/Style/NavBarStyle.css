@@ -18,8 +18,8 @@
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    background: rgba(0, 0, 0, 0.7); /* Slightly darker translucent background */
-    backdrop-filter: blur(10px);
+    background: rgba(0, 0, 0, 0.5); /* Slightly more transparent background */
+    backdrop-filter: blur(20px); /* Increased blur effect */
     border-radius: 15px;
     z-index: 1000;
     padding: clamp(1vh, 2vh, 3vh) clamp(2vw, 4vw, 5vw); /* Dynamic padding */

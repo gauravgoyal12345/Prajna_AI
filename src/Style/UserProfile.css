@@ -1,0 +1,117 @@
+/* General container styling */
+.user-profile-container {
+    display: flex;
+    padding: 20px;
+}
+
+/* PDF sidebar styling */
+.pdf-links-sidebar {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    background-color: #000000;
+    padding: 15px;
+    border-radius: 10px;
+    margin-right: 20px;
+    width: 150px; /* Width of the sidebar */
+    height: 100vh; /* Full height of the screen */
+    overflow-y: auto; /* Allow scrolling if there are many PDFs */
+    margin-top: 120px; /* Shift the PDF sidebar down */
+}
+
+.pdf-links-sidebar h3 {
+    margin-bottom: 15px;
+    color: #ffffff;
+    font-size: 18px;
+    font-weight: bold;
+    text-align: center;
+}
+
+.pdf-link {
+    margin: 10px 0;
+    text-decoration: none;
+    color: #fff;
+    background-color: #3d8b69;
+    padding: 10px;
+    border-radius: 5px;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+    text-align: center; /* Center the text */
+    max-width: 100%; /* Allow button to take full width */
+    width: 150px; /* Set a fixed width for the button */
+    white-space: nowrap; /* Prevent line breaks */
+    overflow: hidden; /* Hide overflowed text */
+    text-overflow: ellipsis; /* Add ellipsis for overflowed text */
+}
+
+.pdf-link:hover {
+    background-color: #28a745; 
+    transform: scale(1.05);
+}
+
+
+/* Main content area */
+.main-content {
+    flex-grow: 1;
+    padding: 20px;
+    text-align: center;
+}
+
+/* Profile section styling */
+.profile-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 70px;
+}
+
+.profile-avatar {
+    border-radius: 50%;
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    margin-right: 20px; /* Margin to separate the avatar from the username */
+    border: 2px solid #1976d2;
+}
+
+/* Username styling */
+.profile-section h2 {
+    color: #ffffff; /* Set the username color to white */
+    font-size: 24px;
+    font-weight: 600;
+}
+
+/* Chat cards container */
+.chat-cards-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 50px;
+    justify-content: center;
+}
+
+/* Chat card styling */
+.chat-card {
+    width: 300px;
+    padding: 20px;
+    background-color: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.chat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+/* Text styling */
+h2 {
+    color: #333;
+    font-size: 24px;
+    font-weight: 600;
+}
+
+p {
+    color: #777;
+    font-size: 16px;
+}
