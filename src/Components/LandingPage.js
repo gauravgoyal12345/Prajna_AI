@@ -41,32 +41,68 @@ const LandingPage = () => {
       checkLocalStorageAndTrigger();
   }, []); 
 
+  // const convertChatDataToLogOut = (chatData) => {
+  //   const result = [];
+  //   let userMessage = "";
+  //   let botMessage = "";
+    
+  //   for (let i = 1; i < chatData.length; i++) {
+  //     const entry = chatData[i];
+      
+  //     if (entry.sender === "user") {
+  //       userMessage = entry.text;
+  //     } else if (entry.sender === "bot") {
+  //       botMessage = entry.text;
+        
+  //       if (userMessage) {
+  //         result.push({
+  //           sender: userMessage,  // User message
+  //           bot: botMessage       // Bot message
+  //         });
+  //         // userMessage = "";  // Reset after storing
+  //       }
+  //     }
+  //   }
+    
+  //   return result;
+  // };
   const convertChatDataToLogOut = (chatData) => {
     const result = [];
     let userMessage = "";
     let botMessage = "";
-    
-    for (let i = 1; i < chatData.length; i++) {
+    let botCitations = "";
+  
+    for (let i = 0; i < chatData.length; i++) {
       const entry = chatData[i];
-      
+  
       if (entry.sender === "user") {
         userMessage = entry.text;
       } else if (entry.sender === "bot") {
         botMessage = entry.text;
-        
+  
+        // If there are citations, format them into a single string
+        if (entry.citations && entry.citations.length > 0) {
+          botCitations = entry.citations.map(citation => {
+            return `Page: ${citation.page_num}, Content: ${citation.page_content}, Source: ${citation.source_link || citation.source_pdf}`;
+          }).join(' | '); // Combine multiple citations into one string separated by " | "
+        } else {
+          botCitations = ""; // No citations for this bot message
+        }
+  
         if (userMessage) {
           result.push({
             sender: userMessage,  // User message
-            bot: botMessage       // Bot message
+            bot: botMessage,      // Bot message
+            citations: botCitations || undefined // Add concatenated citations string if exists
           });
-          // userMessage = "";  // Reset after storing
+          userMessage = "";  // Reset userMessage after storing the pair
         }
       }
     }
-    
+  
     return result;
   };
-
+  
 
    // Handle LogOut and API call
    const handleOk = async (userDetails, chatMessage) => {
