@@ -455,7 +455,7 @@ def save_chat_summary():
     print("chat history --> ", data["chat_history"])
     chat_details = {
         'email': data['email'],
-        # 'chat_history' : data['chat_history'],
+        'chat_history' : data['chat_history'],
         'summary': summary,
         'chat_title' : chat_title,
         'timestamp': datetime.utcnow(), 
@@ -464,17 +464,17 @@ def save_chat_summary():
     # chat_summaries_collection.insert_one(chat_details)
     # Update the document by adding fields directly to it
     try:
-        # chat_summaries_collection.update_one(
-        #     {'session_id': data['session_id']},  # Find the document by session_id
-        #     {'$set': chat_details}  # Update the document with the new fields
-        # )
         chat_summaries_collection.update_one(
             {'session_id': data['session_id']},  # Find the document by session_id
-            {
-                '$set': chat_details,  # Update other fields (email, summary, etc.)
-                '$push': {'chat_history': {'$each': data['chat_history']}}  # Append new chat history
-            }
+            {'$set': chat_details}  # Update the document with the new fields
         )
+        # chat_summaries_collection.update_one(
+        #     {'session_id': data['session_id']},  # Find the document by session_id
+        #     {
+        #         '$set': chat_details,  # Update other fields (email, summary, etc.)
+        #         '$push': {'chat_history': {'$each': data['chat_history']}}  # Append new chat history
+        #     }
+        # )
         
         return jsonify({'message': 'Chat details added successfully'}), 201
 

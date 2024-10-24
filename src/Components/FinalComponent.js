@@ -228,9 +228,9 @@ const displayErrorMessage = (panel, message) => {
       setUserChatMessages(userChat);
       setMessages(userChat);  // Load previous chat messages if available
     } 
-    if (user && !(userChat || userChat.length > 0)) {
+    if (user && !(userChat)) {
       // If there are no chat messages, set the welcome message
-      setUserData(user);
+      // setUserData(user);
       setMessages([ 
         { sender: "bot", text: `Hi ${user.name}! I am PDF-Genie, your personal guide to interact with your documents?` }
       ]);
