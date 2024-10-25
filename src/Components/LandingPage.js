@@ -25,11 +25,10 @@ const LandingPage = () => {
     const chatMessage = JSON.parse(localStorage.getItem('chatMessages'));
     // Check if both exist and their lengths are greater than 1
     if (userDetails && chatMessage && chatMessage.length > 1) {
-      debugger;
       handleOk(userDetails, chatMessage); // Call your handleOk function
       // return;
     }
-    if(userDetails){
+    else if(userDetails && (!chatMessage || chatMessage.length < 1)){
       delete userDetails.uid;
       // Store the updated userDetails back in localStorage
        localStorage.setItem('userDetails', JSON.stringify(userDetails));
