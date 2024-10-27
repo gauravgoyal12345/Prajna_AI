@@ -111,7 +111,14 @@ h2 {
     font-weight: 600;
 }
 
-p {
-    color: #777;
+/* Updated styles for user and bot messages */
+p.user-message {
+    color: #ffffff; /* White color for user messages */
     font-size: 16px;
 }
+
+p.bot-message {
+    color: #777777; /* #777 color for bot messages */
+    font-size: 16px;
+}
+
